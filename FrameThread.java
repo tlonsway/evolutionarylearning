@@ -1,6 +1,6 @@
 public class FrameThread implements Runnable {
     PongGame pg;
-    int fps = 60;
+    int fps = 40;
     public FrameThread(PongGame pong) {
         pg=pong;
     }

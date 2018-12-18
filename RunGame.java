@@ -1,5 +1,5 @@
 import javax.swing.*;
-public class RunPong {
+public class RunGame {
     public static void main(String[] args) {
         int numgens,netspergen,dispgenbest,hidl_num,graphwidth,graphheight;
         numgens=netspergen=dispgenbest=hidl_num=graphwidth=graphheight=0;
@@ -18,10 +18,10 @@ public class RunPong {
         }
         if (args.length==0) {
             System.out.println("no arguments supplied, using default settings");
-            numgens=500;
-            netspergen=35;
+            numgens=1000;
+            netspergen=50;
             dispgenbest=0;
-            hidl_num=10;
+            hidl_num=16;
             graphwidth=400;
             graphheight=420;
         }
@@ -82,7 +82,9 @@ public class RunPong {
         frame.setVisible(true);
         frame.setSize(600,600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
         PongGame p = new PongGame();
+        //Snake p = new Snake(20,20,600,620);
         frame.add(p);
         p.setVisible(true);
         int[] layers = {3,hidl_num,1};
@@ -149,7 +151,7 @@ public class RunPong {
         }
         System.out.println("average bestnet score is " + (sum/1000));
         while(true) {
-            int score=p.simulate(bestnet,true,false,true)[0];
+            int score=p.simulate(bestnet,true,true,true)[0];
             System.out.println("bestnet scored: " + score);
         }
         //p.draw();

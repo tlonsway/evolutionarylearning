@@ -1,6 +1,6 @@
 public class StatFrameThread implements Runnable {
     StatisticsGraph sg;
-    int fps = 60;
+    int fps = 25;
     public StatFrameThread(StatisticsGraph sgraph) {
         sg=sgraph;
     }

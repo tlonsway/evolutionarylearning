@@ -72,7 +72,7 @@ public class StatisticsGraph extends JComponent{
                 double median = 0;
                 if (medianlist.size()%2==0 && medianlist.size()>0) {
                     median = (medianlist.get((int)(medianlist.size()/2))).getY();    
-                } else if(medianlist.size()>0){
+                } else if(medianlist.size()>1){
                     median = (((medianlist.get((int)(medianlist.size()/2))).getY())+((medianlist.get(((int)((medianlist.size()/2)-1)))).getY()))/2;
                 }
                 g.drawString("MEDIAN: " + median,30,40);
