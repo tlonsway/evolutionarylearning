@@ -19,9 +19,9 @@ public class RunGame {
         if (args.length==0) {
             System.out.println("no arguments supplied, using default settings");
             numgens=1000;
-            netspergen=50;
-            dispgenbest=0;
-            hidl_num=16;
+            netspergen=30;
+            dispgenbest=1;
+            hidl_num=10;
             graphwidth=400;
             graphheight=420;
         }
