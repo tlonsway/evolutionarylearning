@@ -1,9 +1,10 @@
-import java.awt.*;
 import javax.swing.*;
-public class PongGame extends JComponent {
+import java.awt.*;
+public class PongGameTwo extends JComponent {
     double ballx;
     double bally;
     double paddlex;
+    double paddle2x;
     int ballxdir;
     int ballydir;
     int delay=2;
@@ -13,22 +14,31 @@ public class PongGame extends JComponent {
     int lastdir;
     double time;
     int score2;
-    public PongGame() {
+    Network net1;
+    Network net2;
+    boolean trained;
+    int hits;
+    public PongGameTwo() {
+        trained=false;
         lose=false;
         score=0;
         score2=0;
+        hits=0;
         ballx=300;
         bally=200;
         paddlex=300;
-        //ballxdir=(int)((Math.random()*11)+3)-(int)((Math.random()*22));
-        //ballydir=(int)((Math.random()*11)+3)-(int)((Math.random()*22));
+        paddle2x=300;
         ballxdir=(-10 + (int)(Math.random() * (20) + 1));
         ballydir=(-10 + (int)(Math.random() * (20) + 1));
         bally=(Math.random()*560);
-        //System.out.println("ball x dir: " + ballxdir);
-        //System.out.println("ball y dir: " + ballydir);
         lastdir=0;
         time=0;
+        System.out.println("training first network");
+        net1=RunGame.getPongNet();
+        System.out.println("training second network");
+        net2=RunGame.getPongNet();
+        System.out.println("both networks trained");
+        trained=true;
     }
     public void update() {
         ballx+=ballxdir;
@@ -37,50 +47,45 @@ public class PongGame extends JComponent {
             ballxdir=-ballxdir;
             ballydir=ballydir;
         }
-        if (bally<=0 || bally>=540) {
+        if (bally<=60 || bally>=540) {
             ballxdir=ballxdir;
             ballydir=-ballydir;
+            hits++;
         }
+        double[] decision1 = net1.forward(new double[]{ballx,bally,paddlex});
+        double[] decision2 = net2.forward(new double[]{ballx,600-bally,paddle2x});
         if (bally>=540 && !(ballx>=paddlex&&ballx<=paddlex+100)) {
             lose=true;
-        } else if (bally>=540 && (ballx>=paddlex&&ballx<=paddlex+100)) {
-            score+=10000;
-            score2++;
         }
-        if (Math.abs(ballx-paddlex)<20) {
-            //score+=100;
+        if (bally<=40 && !(ballx>=paddle2x&&ballx<=paddle2x+100)) {
+            lose=true;
         }
-        double[] decision = n.forward(new double[]{ballx,bally,paddlex});
-        /*if (decision[0]>.6 && lastdir!=-1) {
-            score+=1;
-        }
-        if (decision[0]<.4 && lastdir!=1) {
-            score+=1;
-        }*/
-        if (decision[0]>=.4 && decision[0]<.6 && lastdir==0) {
-            score-=50;
-        }
-        lastdir=0;
         if (paddlex<=500) {
-            if (decision[0]>.6) {
+            if (decision1[0]>.6) {
                 paddlex+=8;
                 lastdir=1;
             }
         }
         if (paddlex>=0) {
-            if (decision[0]<.4) {
+            if (decision1[0]<.4) {
                 paddlex-=8;
                 lastdir=-1;
             }
         }
-        if (paddlex<=200 && paddlex>=100) {
-            //score+=1000;
+        if (paddle2x<=500) {
+            if (decision2[0]>.6) {
+                paddle2x+=8;
+                lastdir=1;
+            }
         }
-        if (paddlex<=50 || paddlex>=450) {
-            score-=100;
+        if (paddle2x>=0) {
+            if (decision2[0]<.4) {
+                paddle2x-=8;
+                lastdir=-1;
+            }
         }
-        if (time>850) {
-            lose=true;
+        if (lose) {
+            reset();
         }
     }
     public void draw() {
@@ -93,12 +98,8 @@ public class PongGame extends JComponent {
         g.setColor(Color.WHITE);
         g.fillRect((int)ballx,(int)bally,20,20);
         g.fillRect((int)paddlex,540,100,20);
-        if (lose) {
-            g.drawString("YOU LOST",20,20);
-        }
-        g.drawString("SCORE: " + score,20,50);
-        g.drawString("DIRECTION: " + lastdir,20,110);
-        g.drawString("PONG HITS: " + score2,20,80);
+        g.fillRect((int)paddle2x,40,100,20);
+        g.drawString("TOTAL HITS: " + hits, 20, 30);
     }
     public int[] simulate() {
         reset();
@@ -131,11 +132,13 @@ public class PongGame extends JComponent {
     public void reset() {
         lose=false;
         time=0;
+        hits=0;
         score=0;
         score2=0;
         ballx=300;
         bally=200;
         paddlex=300;
+        paddle2x=300;
         ballxdir=(-10 + (int)(Math.random() * (20) + 1));
         ballydir=(-10 + (int)(Math.random() * (20) + 1));  
         while(Math.abs(ballxdir)<3 || Math.abs(ballydir)<3) {
@@ -144,4 +147,7 @@ public class PongGame extends JComponent {
         }
         bally=(Math.random()*560);
     }
-}
+    public boolean isTrained() {
+        return trained;
+    }
+}    
