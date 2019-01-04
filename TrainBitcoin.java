@@ -1,24 +1,58 @@
+import java.util.concurrent.TimeUnit;
+import java.util.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 public class TrainBitcoin {
     public static void main(String[] args) {
-        int numgens,netspergen,dispgenbest,hidl_num;
-        numgens=netspergen=dispgenbest=hidl_num=0;
+        int numgens,netspergen,hidl_num;
+        numgens=netspergen=hidl_num=0;
         
-        numgens=3000;
-        netspergen=50;
-        dispgenbest=0;
-        hidl_num=96;
+        if (args.length==0) {
+            numgens=10000;
+            netspergen=40;
+            hidl_num=64;
+        } else if (args.length!=3) {
+            System.out.println("incorrect args supplied - format follows: program.jar numgens netspergen hidl_num");
+            System.exit(0);
+        } else {
+            numgens=Integer.parseInt(args[0]);
+            netspergen=Integer.parseInt(args[1]);
+            hidl_num=Integer.parseInt(args[2]);
+        }
+        
+        //add display of current settings
+        
+        String calcStartTime = printDate();
+        
+        System.out.println("Starting calculation at " + calcStartTime);
+        System.out.println("\nCurrent network settings");
+        System.out.println("numgens: " + numgens + "\nnetspergen: " + netspergen + "\nhidl_num: " + hidl_num + "\n\n");
+        
         
         SimulateBitcoin p = new SimulateBitcoin();
         
-        int[] layers = {48,hidl_num,24};
+        int[] layers = {48,hidl_num,hidl_num,24};
         Generation g = new Generation(netspergen,layers);
-        int bestscore=-1000000;
+        int bestscore=-10000000;
         Network bestnet = null;
         int genamt=numgens;
+        long startTime=java.lang.System.currentTimeMillis();
+        BitcoinThread[] btcthreads = new BitcoinThread[netspergen];
+        for(int i=0;i<netspergen;i++) {
+            btcthreads[i]=new BitcoinThread();
+        }
         for(int i=0;i<genamt;i++) {
+            btcthreads = new BitcoinThread[netspergen];
+            for(int i2=0;i2<netspergen;i2++) {
+                btcthreads[i2]=new BitcoinThread();
+            }
             Network[] nets = g.getNets();
+
+            /*
             for(Network n : nets) {
-                int score = p.simulate(n);;
+                
+                
+                int score = p.simulate(n);
                 if (score>bestscore) {
                     bestscore=score;
                     System.out.println("new best score of " + bestscore);
@@ -28,25 +62,56 @@ public class TrainBitcoin {
                 }
                 n.setScore(score);
             }
+            */
+            
+            for(int ni=0;ni<nets.length;ni++) {
+                btcthreads[ni].setNet(nets[ni]);
+                btcthreads[ni].start();                
+            }
+            for(int ni=0;ni<nets.length;ni++) {
+                try {
+                    btcthreads[ni].join();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            for(int ni=0;ni<nets.length;ni++) {
+                int netscore = btcthreads[ni].getScore();
+                if (netscore>bestscore) {
+                    bestscore=netscore;
+                    bestnet=btcthreads[ni].getNet();
+                    System.out.println("new best score of " + bestscore);
+                }
+                nets[ni].setScore(netscore);
+            }
+            
             g.sortGen();
             Network genBest = g.getNets()[0];
             g.setNets(nets);
             if (i!=genamt-1) {
                 g.nextGen();
             }
-            if (i%50==0) {
+            if (i%(genamt/100)==0) {
                 System.out.println(((double)i/(double)genamt)*100 + "% complete with network");
+            }
+            if (i==2) {
+                long seconds = (long)(((((double)(java.lang.System.currentTimeMillis()-startTime))/3)/1000)*(double)genamt);
+                int day = (int)TimeUnit.SECONDS.toDays(seconds);        
+                long hours = TimeUnit.SECONDS.toHours(seconds) - (day *24);
+                long minute = TimeUnit.SECONDS.toMinutes(seconds) - (TimeUnit.SECONDS.toHours(seconds)* 60);
+                long second = TimeUnit.SECONDS.toSeconds(seconds) - (TimeUnit.SECONDS.toMinutes(seconds) *60);
+                System.out.println("Predicted computation time: " + day + " days " + hours + " hours " + minute + " minutes " + second + " seconds");
             }
         }
         g.sortGen();
         System.out.println("simulating final network - with a score of " + bestnet.getScore());
         bestnet.printNet();
         int sum=0;
-        System.out.println("testing best network 1,000 times");
-        for(int i=0;i<1000;i++) {
+        System.out.println("testing best network");
+        for(int i=0;i<1;i++) {
             sum+=p.simulate(g.getNets()[0]);
         }
-        System.out.println("average bestnet score is " + (sum/1000));
+        System.out.println("bestnet score is " + (sum/1));
         /*while(true) {
             int score=p.simulate(bestnet,true,false,true)[0];
             System.out.println("bestnet scored: " + score);
@@ -64,7 +129,17 @@ public class TrainBitcoin {
         System.out.println("\n\nnext 24 hours prediction:\n");
         double[] netout = bestnet.forward(testarr);
         for(int i=0;i<netout.length;i++) {
-            System.out.println("$" + netout[i]*25000);
+            System.out.println("$" + (((double)((int)((netout[i]*25000)*100)))/100));
         }
+        
+        System.out.println("\nCalculation started at " + calcStartTime);
+        System.out.println("\nCalculation complete at " + printDate());
+    }
+    public static String printDate() {
+        Date date = new Date();
+        String strDateFormat = "hh:mm:ss a";
+        DateFormat dateFormat = new SimpleDateFormat(strDateFormat);
+        String formattedDate= dateFormat.format(date);
+        return formattedDate;
     }
 }
