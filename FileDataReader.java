@@ -2,7 +2,8 @@ import java.io.*;
 import java.util.*;
 public class FileDataReader {
     public static ArrayList<Double> btcHour() {
-        String FILENAME = "coinbase_hourly.txt";
+        //String FILENAME = "coinbase_hourly.txt";
+        String FILENAME = "gemini_hourly.txt";
         ArrayList<Double> ret = new ArrayList<Double>();
         String line = "";
         try {
@@ -18,7 +19,8 @@ public class FileDataReader {
         return ret;
     }
     public static ArrayList<Double> btcHourNormal() {
-        String FILENAME = "coinbase_hourly.txt";
+        //String FILENAME = "coinbase_hourly.txt";
+        String FILENAME = "gemini_hourly.txt";
         ArrayList<Double> ret = new ArrayList<Double>();
         String line = "";
         try {

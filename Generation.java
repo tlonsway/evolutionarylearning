@@ -61,13 +61,14 @@ public class Generation {
         //System.out.println("BEST GEN SCORE: " + networks[0].getScore());
         Network[] oldnetworks=networks;
         ArrayList<Network> newnets = new ArrayList<Network>();
+        int numrandom = 15;
         for(int i=0;i<5;i++) {
             newnets.add(oldnetworks[i]);
         }
-        for(int i=0;i<3;i++) {
+        for(int i=0;i<numrandom;i++) {
             newnets.add(new Network(lys));
         }   
-        for(int i=0;i<numnet-5-3;i++) {
+        for(int i=0;i<numnet-5-numrandom;i++) {
             newnets.add(combine(oldnetworks[i%5],oldnetworks[(int)(Math.random()*oldnetworks.length)]));
             //newnets.add(combine(oldnetworks[i%5],oldnetworks[4-(i%5)]));
         }
@@ -95,12 +96,21 @@ public class Generation {
         for(int i=0;i<lys.length-1;i++) {
             for(int i2=0;i2<lys[i]*lys[i+1];i2++) {
                 int choice = (int)(Math.random()*2);
+                int mutation = (int)(Math.random()*2000);
+                boolean mutate=false;
+                if (mutation<1) {
+                    mutate=true;
+                    choice=-1;
+                }
+                if (mutate) {
+                    newnet.get(i)[i2]=Math.random();
+                }
                 //System.out.println("i: " + i);
                 //System.out.println("i2: " + i2);
                 //System.out.println("choice: " + choice);
                 if(choice==0) {
                     newnet.get(i)[i2]=one.getWeights().get(i)[i2];
-                } else {
+                } else if (choice==1) {
                     newnet.get(i)[i2]=two.getWeights().get(i)[i2];
                 }
             }

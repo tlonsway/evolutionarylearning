@@ -3,7 +3,7 @@ public class SimulateBitcoin {
     ArrayList<Double> prices;
     final int NORMALIZEPOINT = 25000;
     int ins = 24;
-    int outs = 2;
+    int outs = 1;
     public SimulateBitcoin() {
         prices=FileDataReader.btcHour();
     }
