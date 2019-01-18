@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.util.*;
 public class RunGame {
     public static void main(String[] args) {
         int numgens,netspergen,dispgenbest,hidl_num,dispgraphs,graphwidth,graphheight;
@@ -19,8 +20,8 @@ public class RunGame {
         }
         if (args.length==0) {
             System.out.println("no arguments supplied, using default settings");
-            numgens=750;
-            netspergen=30;
+            numgens=750; //750
+            netspergen=20; //30
             dispgenbest=0;
             hidl_num=10;
             dispgraphs=1;
@@ -88,7 +89,7 @@ public class RunGame {
         frame.setVisible(true);
         frame.setSize(600,600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
+
         PongGame p = new PongGame();
         //Snake p = new Snake(20,20,600,620);
         frame.add(p);
@@ -98,6 +99,9 @@ public class RunGame {
         int bestscore=-1;
         Network bestnet = null;
         int genamt=numgens;
+        
+        ArrayList<Double> allscoresrounded = new ArrayList<Double>();
+        
         for(int i=0;i<genamt;i++) {
             Network[] nets = g.getNets();
             for(Network n : nets) {
@@ -112,6 +116,8 @@ public class RunGame {
                     sum2+=scoreb[1];
                 }
                 int score = (int)(sum/2);
+                allscoresrounded.add(10*((double)((int)(score/10))));
+                
                 int score2 = (int)(sum2/2);
                 //sg.addPoint(i,score);
                 //sg.redraw();
@@ -149,6 +155,41 @@ public class RunGame {
             }
             //g.nextGenRand();
         }
+        
+        /*for(Double d : allscoresrounded) {
+            System.out.println(d);
+        }*/
+        
+        double[][] freqs = freqlist(allscoresrounded);
+        System.out.println("nums");
+        for(int i=0;i<freqs.length;i++) {
+            System.out.println(freqs[i][0]);
+        }
+        System.out.println("frequencies");
+        for(int i=0;i<freqs.length;i++) {
+            System.out.println(freqs[i][1]);
+        }
+        
+        JFrame normalgraph = new JFrame("Normal Distribution Graph");
+            normalgraph.setSize(graphwidth,graphheight);
+            normalgraph.setResizable(false);
+            normalgraph.setVisible(true);
+            normalgraph.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            StatisticsGraph normg = new StatisticsGraph(normalgraph,graphwidth,graphheight);        
+            normalgraph.add(normg);
+            normg.setVisible(true);  
+        for(int i=0;i<freqs.length;i++) {
+            if (freqs[i][0]<50000) {
+                normg.addPoint(freqs[i][0]+50000,freqs[i][1]);
+            }
+            try {
+                Thread.sleep(10);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        
+        
         g.sortGen();
         System.out.println("simulating final network - with a score of " + bestnet.getScore());
         bestnet.printNet();
@@ -215,5 +256,49 @@ public class RunGame {
             }
         }
         return bestnet;
+    }
+    public static double[][] freqlist(ArrayList<Double> dlist) {
+        double[][] ret = new double[dlist.size()][2];
+        for(Double d : dlist) {
+            boolean found = false;
+            for(int i=0;i<ret.length;i++) {
+                if (d==ret[i][0]) {
+                    ret[i][1]++;
+                    found=true;
+                    break;
+                }
+            }
+            if (!found) {
+                for(int i=0;i<ret.length;i++) {
+                    if (ret[i][1]==0) {
+                        ret[i][1]=1;
+                        ret[i][0]=d;
+                        break;
+                    }
+                }
+            }
+        }
+        int retlength = 0;
+        for(int i=0;i<dlist.size();i++) {
+            if (ret[i][1]==0) {
+                retlength=i;
+                break;
+            }
+        }
+        double[][] retsorted = new double[retlength][2];
+        for(int i=0;i<retlength;i++) {
+            double minval=1000000000;
+            int minin = 0;
+            for(int i2=0;i2<retlength;i2++) {
+                if (ret[i2][0]<minval&&ret[i2][0]!=-1) {
+                    minval=ret[i2][0];
+                    minin=i2;
+                }
+            }
+            ret[minin][0]=-1;
+            retsorted[i][0]=minval;
+            retsorted[i][1]=ret[minin][1];
+        }
+        return retsorted;
     }
 }

@@ -79,7 +79,7 @@ public class PongGame extends JComponent {
         if (paddlex<=50 || paddlex>=450) {
             score-=100;
         }
-        if (time>850) {
+        if (time>850) { //time is 850 normally
             lose=true;
         }
     }
