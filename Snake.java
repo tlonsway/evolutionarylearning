@@ -336,7 +336,7 @@ public class Snake extends JComponent {
                 draw();
                 try {
                     if (delay) {
-                        Thread.sleep(100);
+                        Thread.sleep(25);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -412,8 +412,8 @@ public class Snake extends JComponent {
                 }
             }
         }
-        vals[24]=snakex;
-        vals[25]=snakey;
+        vals[24]=width;
+        vals[25]=height;
         return vals;
     }
 }

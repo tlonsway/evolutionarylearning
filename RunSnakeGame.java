@@ -23,7 +23,7 @@ public class RunSnakeGame {
             numgens=200; //750
             netspergen=500; //30
             dispgenbest=1;
-            hidl_num=24;
+            hidl_num=18;
             dispgraphs=0;
             graphwidth=400;
             graphheight=420;
@@ -90,7 +90,7 @@ public class RunSnakeGame {
         frame.setSize(600,600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        Snake p = new Snake(40,40,600,600);
+        Snake p = new Snake(80,80,600,600);
         //Snake p = new Snake(20,20,600,620);
         frame.add(p);
         p.setVisible(true);
