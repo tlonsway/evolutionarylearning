@@ -61,14 +61,14 @@ public class Generation {
         //System.out.println("BEST GEN SCORE: " + networks[0].getScore());
         Network[] oldnetworks=networks;
         ArrayList<Network> newnets = new ArrayList<Network>();
-        int numrandom = 15;
-        for(int i=0;i<5;i++) {
+        int numrandom = 150;
+        for(int i=0;i<50;i++) {
             newnets.add(oldnetworks[i]);
         }
         for(int i=0;i<numrandom;i++) {
             newnets.add(new Network(lys));
         }   
-        for(int i=0;i<numnet-5-numrandom;i++) {
+        for(int i=0;i<numnet-50-numrandom;i++) {
             newnets.add(combine(oldnetworks[i%5],oldnetworks[(int)(Math.random()*oldnetworks.length)]));
             //newnets.add(combine(oldnetworks[i%5],oldnetworks[4-(i%5)]));
         }
