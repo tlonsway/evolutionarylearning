@@ -87,6 +87,10 @@ public class Snake extends JComponent {
             dir=3;
         }
         
+        if (dir!=lastdec) {
+            score+=2500;
+        }
+        
         if (dir==0&&lastdec==3 || dir==3&&lastdec==1 || dir==1&&lastdec==2 || dir==2&&lastdec==1) {
             score-=15000;
         }
@@ -140,7 +144,7 @@ public class Snake extends JComponent {
             cydir=2;
         }
         int backloss=5000;
-        int closegain=1000;        
+        int closegain=2000;        
         /*if (dir==0) {
             snakex++;
         }
@@ -294,7 +298,7 @@ public class Snake extends JComponent {
             //score+=50;
         }
         if (snakex>width || snakex<0 || snakey<0 || snakey>height) {
-            score-=100000;
+            score-=10000;
             lose=true;
         }
         //update();
