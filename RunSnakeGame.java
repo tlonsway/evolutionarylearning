@@ -20,9 +20,9 @@ public class RunSnakeGame {
         }
         if (args.length==0) {
             System.out.println("no arguments supplied, using default settings");
-            numgens=2000; //750
-            netspergen=2000; //30
-            dispgenbest=0;
+            numgens=250; //750
+            netspergen=2500; //30
+            dispgenbest=1;
             hidl_num=18;
             dispgraphs=1;
             graphwidth=400;

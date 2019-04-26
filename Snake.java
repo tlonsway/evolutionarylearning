@@ -301,7 +301,7 @@ public class Snake extends JComponent {
             //score+=50;
         }
         if (snakex>=width || snakex<0 || snakey<0 || snakey>=height) {
-            score-=2500000;
+            score-=500000;
             lose=true;
         }
         //update();
