@@ -18,13 +18,15 @@ public class Snake extends JComponent {
     int score2=0;
     boolean lose;
     Network n;
-    int time;
+    double time;
     int numfood;
     int lastdec;
     double insidediag;
     double outsidediag;
     double[] outputs;
     double[] inputs;
+    int timeout;
+    int gennum;
     public Snake(int w, int h, int sw, int sh) {
         width=w;
         height=h;
@@ -39,11 +41,12 @@ public class Snake extends JComponent {
         numfood=1;
         time=0;
         lastdec=0;
-        food = new int[]{(int)(Math.random()*(width)),(int)(Math.random()*(height))};
+        food = new int[]{(int)(Math.random()*(width-1))+1,(int)(Math.random()*(height-1))+1};
         insidediag = Math.sqrt((w-0)*(w-0)+(h-0)*(h-0));
         outsidediag = Math.sqrt((w+2)*(w+2)+(h+2)*(h+2));
         dir=1;
         outputs = new double[4];
+        gennum=0;
     }
     public void update() {
         if (previous.size()>0) {
@@ -87,12 +90,12 @@ public class Snake extends JComponent {
             dir=3;
         }
         
-        if (dir!=lastdec) {
-            score+=2500;
-        }
-        
         if (dir==0&&lastdec==3 || dir==3&&lastdec==1 || dir==1&&lastdec==2 || dir==2&&lastdec==1) {
-            score-=15000;
+            dir=lastdec;
+            //score=-1000000;
+            //lose=true;
+        } else if (dir!=lastdec) {
+            //score+=1250;
         }
         
         /*if (dirchoice==0) {
@@ -143,8 +146,8 @@ public class Snake extends JComponent {
         } else if (food[1]==snakey) {
             cydir=2;
         }
-        int backloss=5000;
-        int closegain=2000;        
+        int backloss=1000;
+        int closegain=0;        
         /*if (dir==0) {
             snakex++;
         }
@@ -280,7 +283,7 @@ public class Snake extends JComponent {
             }
         }*/
         
-        score+=1000;
+        //score+=250;
         
         if (decision[0]>=.33&&decision[0]<.66) {
             //score-=1000;
@@ -291,14 +294,14 @@ public class Snake extends JComponent {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (time>100) {
+        if (time>timeout) {
             //score+=100000;
             lose=true;
         } else {
             //score+=50;
         }
-        if (snakex>width || snakex<0 || snakey<0 || snakey>height) {
-            score-=10000;
+        if (snakex>=width || snakex<0 || snakey<0 || snakey>=height) {
+            score-=2500000;
             lose=true;
         }
         //update();
@@ -327,12 +330,15 @@ public class Snake extends JComponent {
         g.drawString("out2: " + outputs[1],0,210);
         g.drawString("out3: " + outputs[2],0,240);
         g.drawString("out4: " + outputs[3],0,270);
+        g.drawString("Generation: " + gennum,0,height-40);
         for(int i=0;i<inputs.length;i+=1) {
-            g.drawString(i + " : " + inputs[i],400,30+i*20);
+            g.drawString(i + " : " + inputs[i],screenwidth-200,30+i*20);
         }
     }
-    public int[] simulate(Network net, boolean draw, boolean btime, boolean delay) {
+    public int[] simulate(Network net, boolean draw, boolean btime, boolean delay, int t, int gnum) {
+        timeout=t; //0 if turn timer not beign used
         n=net;
+        gennum=gnum;
         reset();
         while(!lose) {
             update();
@@ -340,7 +346,7 @@ public class Snake extends JComponent {
                 draw();
                 try {
                     if (delay) {
-                        Thread.sleep(25);
+                        Thread.sleep(15);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -362,7 +368,7 @@ public class Snake extends JComponent {
         snakex=(int)(Math.random()*(width));
         snakey=(int)(Math.random()*(height));
         previous = new ArrayList<int[]>();
-        food = new int[]{(int)(Math.random()*(width)),(int)(Math.random()*(height))};
+        food = new int[]{(int)(Math.random()*(width-1))+1,(int)(Math.random()*(height-1))+1};
     }
     public void leftPress() {
         if (dir!=2) {
@@ -384,8 +390,8 @@ public class Snake extends JComponent {
             dir=3;
         }
     }
-     public double[] getInputs(){
-        double[] vals = new double[26];
+    public double[] getInputs(){
+        double[] vals = new double[24];
         int x = 0;
         int y  = 0;
         int count = 0;
@@ -405,19 +411,17 @@ public class Snake extends JComponent {
                         }
                         else if(vals[count*3+1] == 0 && x == food[0] && y == food[1]){
                             //System.out.println("food found");
-                            vals[count*3+1] = Math.sqrt(Math.abs((x-snakex)*(x-snakex)) + Math.abs((y-snakey)*(y-snakey)))/maxInsideDis;
+                            vals[count*3+1] = Math.sqrt(Math.abs((x-snakex)*(x-snakex)) + Math.abs((y-snakey)*(y-snakey))/maxOutsideDis);
                         }
                         else if(vals[count*3+2] == 0 && contains(x,y)){
                             //System.out.println("body found");
-                            vals[count*3+2] = Math.sqrt(Math.abs((x-snakex)*(x-snakex)) + Math.abs((y-snakey)*(y-snakey)))/maxInsideDis;
+                            vals[count*3+2] = Math.sqrt(Math.abs((x-snakex)*(x-snakex)) + Math.abs((y-snakey)*(y-snakey))/maxOutsideDis);
                         }
                     }
                     count++;
                 }
             }
         }
-        vals[24]=width;
-        vals[25]=height;
         return vals;
     }
 }

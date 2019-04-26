@@ -95,7 +95,7 @@ public class RunGame {
         frame.add(p);
         p.setVisible(true);
         int[] layers = {3,hidl_num,1};
-        Generation g = new Generation(netspergen,layers);
+        Generation g = new Generation(netspergen,layers,.05,.1);
         int bestscore=-1;
         Network bestnet = null;
         int genamt=numgens;
@@ -222,7 +222,7 @@ public class RunGame {
         PongGame p = new PongGame();
         p.setVisible(true);
         int[] layers = {3,hidl_num,1};
-        Generation g = new Generation(netspergen,layers);
+        Generation g = new Generation(netspergen,layers,.05,.1);
         int bestscore=-1;
         Network bestnet = null;
         int genamt=numgens;

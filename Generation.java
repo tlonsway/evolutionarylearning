@@ -1,15 +1,23 @@
 import java.util.*;
 public class Generation {
     int numnet;
+    double topprop = .1; //proportion out of 1 of the number of networks to use as the "best"
+    double mutaterate = .05; //proportion out of 1 of the number of the top networks to mutate
     Network[] networks;
     int[] lys;
-    public Generation(int networknum, int[] netlayers) {
+    public Generation(int networknum, int[] netlayers, double mrate, double tprop) {
+        if (!(networknum>=20)) {
+            System.out.println("FATAL ERROR: There must be at least 20 networks in a generation");
+            System.exit(1);
+        }
         numnet=networknum;
         lys=netlayers;
         networks = new Network[numnet];
         for(int i=0;i<numnet;i++) {
             networks[i]=new Network(netlayers);
         }
+        mutaterate=mrate;
+        topprop=tprop;
     }
     public void sortGen() {
         ArrayList<Network> nets = new ArrayList<Network>();
@@ -76,6 +84,35 @@ public class Generation {
             networks[i]=newnets.get(i);
         }
     }
+    public void newNextGen() {
+        sortGen();
+        Network[] oldnets = new Network[(int)(numnet*topprop)]; //top percent of nets from previous
+        ArrayList<Network> newnets = new ArrayList<Network>();
+        //gather top percentage of scorers
+        for(int i=0;i<oldnets.length;i++) {
+            oldnets[i]=networks[i];
+        }
+        //add in the top scorers to the new generation
+        for(Network n : oldnets) {
+            newnets.add(new Network(lys,n.getWeights()));
+        }
+        //genetically breed the top percentage to make a new full set of data
+        int numfromprev = (int)((numnet-oldnets.length)/5);
+        for(int i=0;i<numfromprev;i++) {
+            //generate a new network
+            int rand1 = (int)(Math.random()*oldnets.length);
+            int rand2 = (int)(Math.random()*oldnets.length);
+            newnets.add(combine(oldnets[rand1],oldnets[rand2]));
+        }
+        //mutations are automatically added to genetic combinations at mutation rate
+        //add random new networks to add uniqueness
+        for(int i=0;i<numnet-numfromprev;i++) {
+            newnets.add(new Network(lys));
+        }
+        for(int i=0;i<networks.length;i++) {
+            networks[i]=newnets.get(i);
+        }
+    }
     public void nextGenRand() {
         ArrayList<Network> newnets = new ArrayList<Network>();
         sortGen();
@@ -89,6 +126,10 @@ public class Generation {
         }
     }
     public Network combine(Network one, Network two) {
+        boolean mutate1 = false;
+        if (Math.random()<mutaterate) {
+            mutate1=true;
+        }
         ArrayList<double[]> newnet = new ArrayList<double[]>();
         for(int i=0;i<lys.length-1;i++) {
             newnet.add(new double[lys[i]*lys[i+1]]);
@@ -96,13 +137,12 @@ public class Generation {
         for(int i=0;i<lys.length-1;i++) {
             for(int i2=0;i2<lys[i]*lys[i+1];i2++) {
                 int choice = (int)(Math.random()*2);
-                int mutation = (int)(Math.random()*2000);
                 boolean mutate=false;
-                if (mutation<1) {
+                if (Math.random()<mutaterate) {
                     mutate=true;
-                    choice=-1;
                 }
-                if (mutate) {
+                if (mutate1&&mutate) {
+                    choice=-1;
                     newnet.get(i)[i2]=Math.random();
                 }
                 //System.out.println("i: " + i);

@@ -20,11 +20,11 @@ public class RunSnakeGame {
         }
         if (args.length==0) {
             System.out.println("no arguments supplied, using default settings");
-            numgens=100; //750
-            netspergen=500; //30
-            dispgenbest=1;
+            numgens=2000; //750
+            netspergen=2000; //30
+            dispgenbest=0;
             hidl_num=18;
-            dispgraphs=0;
+            dispgraphs=1;
             graphwidth=400;
             graphheight=420;
         }
@@ -87,15 +87,15 @@ public class RunSnakeGame {
         //init pong graphics
         JFrame frame = new JFrame("snake window");
         frame.setVisible(true);
-        frame.setSize(600,600);
+        frame.setSize(915,940);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        Snake p = new Snake(80,80,600,600);
+        Snake p = new Snake(50,50,900,900);
         //Snake p = new Snake(20,20,600,620);
         frame.add(p);
         p.setVisible(true);
-        int[] layers = {26,hidl_num,hidl_num,4};
-        Generation g = new Generation(netspergen,layers);
+        int[] layers = {24,hidl_num,hidl_num,hidl_num,4};
+        Generation g = new Generation(netspergen,layers,.075,.2);
         int bestscore=-1;
         Network bestnet = null;
         int genamt=numgens;
@@ -103,6 +103,7 @@ public class RunSnakeGame {
         ArrayList<Double> allscoresrounded = new ArrayList<Double>();
         
         for(int i=0;i<genamt;i++) {
+            System.out.println("GEN: " + i + "/" + genamt);
             Network[] nets = g.getNets();
             for(Network n : nets) {
                 /*if (i==1000) {
@@ -110,12 +111,12 @@ public class RunSnakeGame {
                 }*/
                 int sum=0;
                 //int sum2=0;
-                for(int i2=0;i2<2;i2++) {
-                    int[] scoreb = p.simulate(n,false,true,false);
+                for(int i2=0;i2<4;i2++) {
+                    int[] scoreb = p.simulate(n,false,true,false,600,i);
                     sum+=scoreb[0];
                     //sum2+=scoreb[1];
                 }
-                int score = (int)(sum/2);
+                int score = (int)(sum/4);
                 allscoresrounded.add(10*((double)((int)(score/10))));
                 
                 //int score2 = (int)(sum2/2);
@@ -136,10 +137,10 @@ public class RunSnakeGame {
             g.sortGen();
             Network genBest = g.getNets()[0];
             if (dispgenbest==1) {
-                p.simulate(genBest,true,true,true);
+                p.simulate(genBest,true,true,true,600,i);
             }
             //sg.addPoint(i,genBest.getScore());
-            if (i%10==0) {
+            if (i%1==0) {
                 if (dispgraphs==1) {
                     arg.addPoint(i,g.getGenAverageScore1());
                     //a2r.addPoint(i,g.getGenAverageScore2());
@@ -150,7 +151,8 @@ public class RunSnakeGame {
             }
             g.setNets(nets);
             if (i!=genamt-1) {
-                g.nextGen();
+                //g.nextGen();
+                g.newNextGen();
                 //g.nextGenRand();
             }
             //g.nextGenRand();
@@ -160,7 +162,7 @@ public class RunSnakeGame {
             System.out.println(d);
         }*/
         
-        double[][] freqs = freqlist(allscoresrounded);
+        /*double[][] freqs = freqlist(allscoresrounded);
         System.out.println("nums");
         for(int i=0;i<freqs.length;i++) {
             System.out.println(freqs[i][0]);
@@ -168,7 +170,7 @@ public class RunSnakeGame {
         System.out.println("frequencies");
         for(int i=0;i<freqs.length;i++) {
             System.out.println(freqs[i][1]);
-        }
+        }*/
         
         JFrame normalgraph = new JFrame("Normal Distribution Graph");
             normalgraph.setSize(graphwidth,graphheight);
@@ -178,7 +180,7 @@ public class RunSnakeGame {
             StatisticsGraph normg = new StatisticsGraph(normalgraph,graphwidth,graphheight);        
             normalgraph.add(normg);
             normg.setVisible(true);  
-        for(int i=0;i<freqs.length;i++) {
+        /*for(int i=0;i<freqs.length;i++) {
             if (freqs[i][0]<50000) {
                 normg.addPoint(freqs[i][0]+50000,freqs[i][1]);
             }
@@ -187,7 +189,7 @@ public class RunSnakeGame {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
+        }*/
         
         
         g.sortGen();
@@ -196,11 +198,11 @@ public class RunSnakeGame {
         int sum=0;
         System.out.println("testing best network 1,000 times");
         for(int i=0;i<1000;i++) {
-            sum+=p.simulate(g.getNets()[0],false,true,false)[0];
+            sum+=p.simulate(g.getNets()[0],false,true,false,0,0)[0];
         }
         System.out.println("average bestnet score is " + (sum/1000));
         while(true) {
-            int score=p.simulate(bestnet,true,false,true)[0];
+            int score=p.simulate(bestnet,true,true,true,2000,genamt)[0];
             System.out.println("bestnet scored: " + score);
         }
         //p.draw();
@@ -211,51 +213,6 @@ public class RunSnakeGame {
         //for(int i=0;i<100;i++) {
         //    System.out.println("SCORE: " + p.simulate());
         //}
-    }
-    public static Network getPongNet() {
-        int numgens,netspergen,dispgenbest,hidl_num;
-        numgens=netspergen=dispgenbest=hidl_num=0;
-        numgens=1000;
-        netspergen=40;
-        dispgenbest=0;
-        hidl_num=10;
-        Snake p = new Snake(25,25,500,500);
-        p.setVisible(true);
-        int[] layers = {3,hidl_num,1};
-        Generation g = new Generation(netspergen,layers);
-        int bestscore=-1;
-        Network bestnet = null;
-        int genamt=numgens;
-        for(int i=0;i<genamt;i++) {
-            Network[] nets = g.getNets();
-            for(Network n : nets) {
-                int sum=0;
-                //int sum2=0;
-                for(int i2=0;i2<2;i2++) {
-                    int[] scoreb = p.simulate(n,false,true,false);
-                    sum+=scoreb[0];
-                    //sum2+=scoreb[1];
-                }
-                int score = (int)(sum/2);
-                //int score2 = (int)(sum2/2);
-                if (score>bestscore) {
-                    bestscore=score;
-                    bestnet=n;
-                }
-                n.setScore(score);
-                //n.setScore2(score2);
-            }
-            g.sortGen();
-            Network genBest = g.getNets()[0];
-            g.setNets(nets);
-            if (i!=genamt-1) {
-                g.nextGen();
-            }
-            if (i%10==0) {
-                System.out.println(((double)i/(double)genamt)*100 + "% complete with network");
-            }
-        }
-        return bestnet;
     }
     public static double[][] freqlist(ArrayList<Double> dlist) {
         double[][] ret = new double[dlist.size()][2];

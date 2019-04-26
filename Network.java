@@ -52,7 +52,11 @@ public class Network implements Comparable {
                     sum+=neurons.get(i-1)[n1]*weights.get(wrow)[noffset+(neurons.get(i).length*num)];
                     num++;
                 }
-                neurons.get(i)[i2]=sigmoid(sum);
+                if (i==neurons.size()-1) {
+                    neurons.get(i)[i2]=sigmoid(sum);
+                } else {
+                    neurons.get(i)[i2]=relu(sum);
+                }
                 noffset++;
             }
             wrow++;
@@ -65,6 +69,9 @@ public class Network implements Comparable {
     }
     private static double sigmoid(double in) {
         return (1)/(1+(Math.pow(Math.E,-1*in)));
+    }
+    private static double relu(double in) {
+        return in;
     }
     public void setScore(double num) {
         score=num;
