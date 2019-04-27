@@ -27,6 +27,7 @@ public class Snake extends JComponent {
     double[] inputs;
     int timeout;
     int gennum;
+    int timesinceeat;
     public Snake(int w, int h, int sw, int sh) {
         width=w;
         height=h;
@@ -47,6 +48,8 @@ public class Snake extends JComponent {
         dir=1;
         outputs = new double[4];
         gennum=0;
+        timesinceeat=0;
+        System.out.println("TimeSinceEat limit set to " + (16*(width/10*height/10)));
     }
     public void update() {
         if (previous.size()>0) {
@@ -56,11 +59,12 @@ public class Snake extends JComponent {
             previous.set(0,new int[]{snakex,snakey});
         }
         if (food[0]==snakex&&food[1]==snakey) {
-            food = new int[]{(int)(Math.random()*(width)),(int)(Math.random()*(height))};
+            food = new int[]{(int)(Math.random()*(width-1))+1,(int)(Math.random()*(height-1))+1};
             previous.add(new int[]{snakex,snakey});
             score+=100000*numfood;
             score2+=1;
             numfood++;
+            timesinceeat=0;
         }
         inputs = getInputs();
         double[] decision = n.forward(inputs);
@@ -69,14 +73,6 @@ public class Snake extends JComponent {
         //System.out.println("snakex: " + snakex + "  snakey: " + snakey + "  food[0]: " + food[0] + "  food[1]: " + food[1]);
         //System.out.println("Network decision: " + decision[0]);
         int dirchoice=0; //0 is straight, 1 is left, 2 is right, decision[0] is straight, decision[1] is left, decision[2] is right
-
-        if (decision[0]>decision[1]&&decision[0]>decision[2]) {
-            dirchoice=0;
-        } else if (decision[1]>decision[2]) {
-            dirchoice=1;
-        } else {
-            dirchoice=2;
-        } //dir0=right, dir1=down, dir2=up, dir3=left
         
         lastdec=dir;
         
@@ -97,43 +93,6 @@ public class Snake extends JComponent {
         } else if (dir!=lastdec) {
             //score+=1250;
         }
-        
-        /*if (dirchoice==0) {
-            //System.out.println("going straight");
-            dir=dir; //continue straight
-        }
-        if (dirchoice==1) {
-            if (dir==0) {
-                dir=2;
-            }
-            if (dir==1) {
-                dir=0;
-            }
-            if (dir==2) {
-                dir=3;
-            }
-            if (dir==3) {
-                dir=1;
-            }
-        } //turn left
-        if (dirchoice==2) {
-            if (dir==0) {
-                dir=1;
-            }
-            if (dir==1) {
-                dir=3;
-            }
-            if (dir==2) {
-                dir=0;
-            }
-            if (dir==3) {
-                dir=2;
-            }
-        } //turn right
-        */
-        
-        
-        
         int cxdir=0;
         int cydir=0;
         if (food[0]>snakex) {
@@ -147,19 +106,7 @@ public class Snake extends JComponent {
             cydir=2;
         }
         int backloss=1000;
-        int closegain=0;        
-        /*if (dir==0) {
-            snakex++;
-        }
-        if (dir==1) {
-            snakey++;
-        }
-        if (dir==2) {
-            snakey--;
-        }
-        if (dir==3) {
-            snakex--;
-        }*/
+        int closegain=0;
         if (dir==0) {
             snakex++;
             if (cxdir==1) {
@@ -196,95 +143,6 @@ public class Snake extends JComponent {
                 score-=backloss;
             }
         }
-        /*if (decision[0]<.25) {
-            dir=0;
-            score+=1500;
-            //System.out.println("x choice made");
-        } else if (decision[0]<.5) {
-            dir=1;
-        } else if (decision[0]<.75) {
-            dir=2;
-        } else if (decision[0]<=1) {
-            dir=3;
-            score+=1500;
-            //System.out.println("x choice made");
-        }*/
-        /*if (decision[2]>.5) {
-            if (decision[0]>.5) {
-                dir=0;
-            } else {
-                dir=3;
-            }
-        } else {
-            if (decision[1]>.5) {
-                dir=1;
-            } else {
-                dir=2;
-            }
-        }*/
-        /*if (decision[1]<.33) {
-            snakey--;
-            if (lastdec==4) {
-                score-=500;
-            }
-            lastdec=1;
-            if (cydir==0) {
-                score+=closegain;
-            } else {
-                score-=backloss;
-            }
-            if (cxdir==2) {
-                score+=closegain;
-            }
-        } 
-        if (decision[0]<.33) {
-            snakex--;
-            if (lastdec==3) {
-                score-=500;
-            }
-            lastdec=2;
-            if (cxdir==0) {
-                score+=closegain;
-            } else {
-                score-=backloss;
-            }
-            if (cydir==2) {
-                score+=closegain;
-            }
-        }
-        if (decision[0]>=.66) {
-            snakex++;
-            if (lastdec==2) {
-                score-=500;
-            }
-            lastdec=3;
-            if (cxdir==1) {
-                score+=closegain;
-            } else {
-                score-=backloss;
-            }
-            if (cydir==2) {
-                score+=closegain;
-            }
-        }
-        if (decision[1]>=.66) {
-            snakey++;
-            lastdec=4;
-            if (lastdec==1) {
-                score-=500;
-            }
-            if (cydir==1) {
-                score+=closegain;
-            } else {
-                score-=backloss;
-            }
-            if (cxdir==2) {
-                score+=closegain;
-            }
-        }*/
-        
-        //score+=250;
-        
         if (decision[0]>=.33&&decision[0]<.66) {
             //score-=1000;
         }
@@ -294,16 +152,34 @@ public class Snake extends JComponent {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (time>timeout) {
+        if (time>50000) {
             //score+=100000;
             lose=true;
         } else {
             //score+=50;
         }
         if (snakex>=width || snakex<0 || snakey<0 || snakey>=height) {
-            score-=500000;
+            //snake has crashed into a wall
+            score-=1000000;
             lose=true;
         }
+        for(int[] c : previous) {
+            if (c[0]==snakex && c[1]==snakey) {
+                lose=true;
+                score-=1000000;
+                break;
+            }
+        }
+        
+        
+        //if (timesinceeat>(8*(width/10*height/10))) {
+        if (timesinceeat>(16*(width/10*height/10))) {
+            //snake is likely in a loop
+            lose=true;
+            score-=2000000;
+        }
+        
+        timesinceeat++;
         //update();
     }
     public void draw() {
@@ -321,7 +197,8 @@ public class Snake extends JComponent {
         g.setColor(Color.RED);
         g.fillRect(food[0]*(screenwidth/width), food[1]*(screenheight/height), screenwidth/width, screenheight/height);
         g.setColor(Color.WHITE);
-        g.drawString("direction: " + lastdec,0,30);
+        String[] dirnames = new String[]{"right","down","up","left"};
+        g.drawString("direction: " + dirnames[lastdec],0,30);
         g.drawString("score: " + score,0,60);
         g.drawString("eats: " + score2,0,90);
         g.drawString("snake x: " + snakex,0,120);
@@ -330,13 +207,18 @@ public class Snake extends JComponent {
         g.drawString("out2: " + outputs[1],0,210);
         g.drawString("out3: " + outputs[2],0,240);
         g.drawString("out4: " + outputs[3],0,270);
-        g.drawString("Generation: " + gennum,0,height-40);
+        g.drawString("Generation: " + gennum,0,screenheight-40);
+        g.drawString("time since eat: " + timesinceeat,0,300);
         for(int i=0;i<inputs.length;i+=1) {
             g.drawString(i + " : " + inputs[i],screenwidth-200,30+i*20);
         }
     }
     public int[] simulate(Network net, boolean draw, boolean btime, boolean delay, int t, int gnum) {
-        timeout=t; //0 if turn timer not beign used
+        if (timeout!=-1) {
+            timeout=t; //0 if turn timer not beign used, or -1 for automatic timer
+        } else {
+            timeout=4*(16*(width/10*height/10));
+        }
         n=net;
         gennum=gnum;
         reset();
@@ -369,6 +251,7 @@ public class Snake extends JComponent {
         snakey=(int)(Math.random()*(height));
         previous = new ArrayList<int[]>();
         food = new int[]{(int)(Math.random()*(width-1))+1,(int)(Math.random()*(height-1))+1};
+        timesinceeat=0;
     }
     public void leftPress() {
         if (dir!=2) {
@@ -423,5 +306,14 @@ public class Snake extends JComponent {
             }
         }
         return vals;
+    }
+    public boolean contains(int x, int y) {
+        boolean in=false;
+        for(int[] i : previous) {
+            if (i[0]==x && i[1]==y) {
+                in=true;
+            }
+        }
+        return in;
     }
 }

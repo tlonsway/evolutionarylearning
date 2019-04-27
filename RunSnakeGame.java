@@ -22,7 +22,7 @@ public class RunSnakeGame {
             System.out.println("no arguments supplied, using default settings");
             numgens=250; //750
             netspergen=2500; //30
-            dispgenbest=1;
+            dispgenbest=0;
             hidl_num=18;
             dispgraphs=1;
             graphwidth=400;
@@ -95,7 +95,7 @@ public class RunSnakeGame {
         frame.add(p);
         p.setVisible(true);
         int[] layers = {24,hidl_num,hidl_num,hidl_num,4};
-        Generation g = new Generation(netspergen,layers,.075,.2);
+        Generation g = new Generation(netspergen,layers,.01,.4);
         int bestscore=-1;
         Network bestnet = null;
         int genamt=numgens;
@@ -112,7 +112,7 @@ public class RunSnakeGame {
                 int sum=0;
                 //int sum2=0;
                 for(int i2=0;i2<4;i2++) {
-                    int[] scoreb = p.simulate(n,false,true,false,600,i);
+                    int[] scoreb = p.simulate(n,false,true,false,-1,i);
                     sum+=scoreb[0];
                     //sum2+=scoreb[1];
                 }
@@ -127,6 +127,10 @@ public class RunSnakeGame {
                     System.out.println("new best score of " + bestscore);
                     System.out.println("BEST NETWORK WEIGHTS:");
                     n.printNet(); 
+                    if (bestnet!=null) {
+                        System.out.println("comparing new bestnet with previous");
+                        Network.compareNets(bestnet, n);
+                    }
                     bestnet=n;
                     //sg.addPoint(i,bestscore);
                 }
@@ -137,7 +141,7 @@ public class RunSnakeGame {
             g.sortGen();
             Network genBest = g.getNets()[0];
             if (dispgenbest==1) {
-                p.simulate(genBest,true,true,true,600,i);
+                p.simulate(genBest,true,true,true,-1,i);
             }
             //sg.addPoint(i,genBest.getScore());
             if (i%1==0) {
@@ -149,7 +153,7 @@ public class RunSnakeGame {
                     bog.addPoint(i,bestscore);
                 }
             }
-            g.setNets(nets);
+            //g.setNets(nets);
             if (i!=genamt-1) {
                 //g.nextGen();
                 g.newNextGen();
@@ -202,7 +206,7 @@ public class RunSnakeGame {
         }
         System.out.println("average bestnet score is " + (sum/1000));
         while(true) {
-            int score=p.simulate(bestnet,true,true,true,2000,genamt)[0];
+            int score=p.simulate(bestnet,true,true,true,20000,genamt)[0];
             System.out.println("bestnet scored: " + score);
         }
         //p.draw();

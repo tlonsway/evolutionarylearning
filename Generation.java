@@ -94,10 +94,11 @@ public class Generation {
         }
         //add in the top scorers to the new generation
         for(Network n : oldnets) {
-            newnets.add(new Network(lys,n.getWeights()));
+            newnets.add(mutate(n)); //add mutations of best networks
+            newnets.add(new Network(lys,n.getWeights())); //direct copy of best networks to next generation
         }
         //genetically breed the top percentage to make a new full set of data
-        int numfromprev = (int)((numnet-oldnets.length)/5);
+        int numfromprev = (int)((numnet-2*oldnets.length)/5);
         for(int i=0;i<numfromprev;i++) {
             //generate a new network
             int rand1 = (int)(Math.random()*oldnets.length);
@@ -106,12 +107,14 @@ public class Generation {
         }
         //mutations are automatically added to genetic combinations at mutation rate
         //add random new networks to add uniqueness
-        for(int i=0;i<numnet-numfromprev;i++) {
+        for(int i=0;i<numnet-2*oldnets.length-numfromprev;i++) {
             newnets.add(new Network(lys));
         }
         for(int i=0;i<networks.length;i++) {
             networks[i]=newnets.get(i);
         }
+        //System.out.println("NETSIZE: " + networks.length);
+        //System.out.println("GENSIZE: " + newnets.size());
     }
     public void nextGenRand() {
         ArrayList<Network> newnets = new ArrayList<Network>();
@@ -124,6 +127,9 @@ public class Generation {
         for(int i=0;i<networks.length;i++) {
             networks[i]=newnets.get(i);
         }
+    }
+    public void nextGenSemiRand() {
+        //new generation consists of previous best, and all others are mutated permutations of the previous best, no randoms or combinations used
     }
     public Network combine(Network one, Network two) {
         boolean mutate1 = false;
@@ -143,7 +149,8 @@ public class Generation {
                 }
                 if (mutate1&&mutate) {
                     choice=-1;
-                    newnet.get(i)[i2]=Math.random();
+                    double num = (Math.random()*2)-1;
+                    newnet.get(i)[i2] = num;
                 }
                 //System.out.println("i: " + i);
                 //System.out.println("i2: " + i2);
@@ -156,6 +163,32 @@ public class Generation {
             }
         }
         return (new Network(lys,newnet));
+    }
+    public Network mutate(Network n) {
+        ArrayList<double[]> newnet = new ArrayList<double[]>();
+        for(int i=0;i<lys.length-1;i++) {
+            newnet.add(new double[lys[i]*lys[i+1]]);
+        }
+        for(int i=0;i<lys.length-1;i++) {
+            for(int i2=0;i2<lys[i]*lys[i+1];i2++) {
+                boolean mutate=false;
+                if (Math.random()<mutaterate) {
+                    mutate=true;
+                }
+                if (mutate) {
+                    double num = (Math.random()*2)-1;
+                    newnet.get(i)[i2] = num;
+                } else {
+                    newnet.get(i)[i2]=n.getWeights().get(i)[i2];
+                }
+            }
+        }
+        Network ret = new Network(lys,newnet);
+        /*System.out.println("before");
+        n.printNet();
+        System.out.println("after");
+        ret.printNet();*/
+        return ret;
     }
     public void setNets(Network[] n) {
         networks=n;

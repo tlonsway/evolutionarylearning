@@ -53,7 +53,8 @@ public class Network implements Comparable {
                     num++;
                 }
                 if (i==neurons.size()-1) {
-                    neurons.get(i)[i2]=sigmoid(sum);
+                    //neurons.get(i)[i2]=sigmoid(sum);
+                    neurons.get(i)[i2]=relu(sum);
                 } else {
                     neurons.get(i)[i2]=relu(sum);
                 }
@@ -98,6 +99,9 @@ public class Network implements Comparable {
     public ArrayList<double[]> getWeights() {
         return weights;
     }
+    public int[] getLayers() {
+        return lys;
+    }
     public void printNet() {
         for(double[] da : weights) {
             for(double d : da) {
@@ -105,5 +109,29 @@ public class Network implements Comparable {
             }
             System.out.println();
         }
+    }
+    public static void compareNets(Network n1, Network n2) {
+        ArrayList<double[]> n1w = n1.getWeights();
+        ArrayList<double[]> n2w = n2.getWeights();
+        if (n1w.size()!=n2w.size()) {
+            System.out.println("FATAL ERROR: compared networks do not have the same weight sizes");
+            System.exit(1);
+        }
+        int[] layers = n1.getLayers();
+        int samenum = 0;
+        int diffnum = 0;
+        for(int i=0;i<layers.length-1;i++) {
+            for(int i2=0;i2<layers[i]*layers[i+1];i2++) {
+                if (n1.getWeights().get(i)[i2]==n2.getWeights().get(i)[i2]) {
+                    samenum++;
+                    //System.out.println("Net similarity found: " + n1.getWeights().get(i)[i2]);
+                } else {
+                    diffnum++;
+                    //System.out.println("Net difference found: n1-" + n1.getWeights().get(i)[i2] + " | n2-" + n2.getWeights().get(i)[i2]);
+                }
+            }
+        }
+        System.out.println("Number of shared weights: " + samenum);
+        System.out.println("Number of different weights: " + diffnum);
     }
 }
