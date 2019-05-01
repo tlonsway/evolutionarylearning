@@ -129,6 +129,30 @@ public class Generation {
         }
     }
     public void nextGenSemiRand() {
+        sortGen();
+        Network[] oldnets = new Network[(int)(numnet*topprop)]; //top percent of nets from previous
+        ArrayList<Network> newnets = new ArrayList<Network>();
+        //gather top percentage of scorers
+        for(int i=0;i<oldnets.length;i++) {
+            oldnets[i]=networks[i];
+        }
+        //add in the top scorers to the new generation
+        for(Network n : oldnets) {
+            //newnets.add(mutate(n)); //add mutations of best networks
+            newnets.add(new Network(lys,n.getWeights())); //direct copy of best networks to next generation
+        }
+        int amt=0;
+        while(amt<numnet-oldnets.length) {
+            for(Network n : oldnets) {
+                if (amt<numnet-oldnets.length) {
+                    newnets.add(mutate(n));
+                    amt++;
+                }
+            }
+        }
+        for(int i=0;i<networks.length;i++) {
+            networks[i]=newnets.get(i);
+        }
         //new generation consists of previous best, and all others are mutated permutations of the previous best, no randoms or combinations used
     }
     public Network combine(Network one, Network two) {

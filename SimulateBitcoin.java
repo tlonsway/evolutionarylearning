@@ -10,15 +10,15 @@ public class SimulateBitcoin {
     public int simulate(Network n) {
         //for each set of 48, 
         long totalscore=0;
-        for(int i=0;i<(prices.size())-ins-outs;i++) {
+        for(int i=0;i<(prices.size()/1000)-ins-outs;i++) {
             double[] netin = new double[ins];
             for(int i2=i;i2<i+ins;i2++) {
-                netin[i2-i]=(prices.get(i2))/NORMALIZEPOINT;
+                netin[i2-i]=(prices.get(i2));
             }
             double[] netout = n.forward(netin);
             //de-normalize output of normalized data
             for(int v=0;v<netout.length;v++) {
-                double dis = Math.abs(prices.get(v+i+ins)-(NORMALIZEPOINT*netout[v]));
+                double dis = Math.abs(prices.get(v+i+ins)-(netout[v]));
                 if (dis>=2500) {
                     totalscore-=75;
                 } else if (dis<=10) {
@@ -28,7 +28,7 @@ public class SimulateBitcoin {
                 } else if (dis<=250) {
                     totalscore+=500;
                 } else if (dis<=500) {
-                    totalscore+=65;
+                    totalscore+=100;
                 } else if (dis<=1000) {
                     totalscore+=50;
                 }            

@@ -61,7 +61,7 @@ public class Snake extends JComponent {
         if (food[0]==snakex&&food[1]==snakey) {
             food = new int[]{(int)(Math.random()*(width-1))+1,(int)(Math.random()*(height-1))+1};
             previous.add(new int[]{snakex,snakey});
-            score+=100000*numfood;
+            score+=10;
             score2+=1;
             numfood++;
             timesinceeat=0;
@@ -105,8 +105,8 @@ public class Snake extends JComponent {
         } else if (food[1]==snakey) {
             cydir=2;
         }
-        int backloss=1000;
-        int closegain=0;
+        int backloss=2;
+        int closegain=1;
         if (dir==0) {
             snakex++;
             if (cxdir==1) {
@@ -152,7 +152,7 @@ public class Snake extends JComponent {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (time>50000) {
+        if (time>timeout) {
             //score+=100000;
             lose=true;
         } else {
@@ -160,24 +160,25 @@ public class Snake extends JComponent {
         }
         if (snakex>=width || snakex<0 || snakey<0 || snakey>=height) {
             //snake has crashed into a wall
-            score-=1000000;
+            //score-=5000000; //forces snake to make 2,000 moves to not go negative
             lose=true;
         }
         for(int[] c : previous) {
             if (c[0]==snakex && c[1]==snakey) {
                 lose=true;
-                score-=1000000;
+                //score-=10000000;
                 break;
             }
         }
-        
+        //score+=2500;
         
         //if (timesinceeat>(8*(width/10*height/10))) {
-        if (timesinceeat>(16*(width/10*height/10))) {
+        
+        /*if (timesinceeat>(16*((width/10)*(height/10)))) {
             //snake is likely in a loop
             lose=true;
-            score-=2000000;
-        }
+            //score=-999999999;
+        }*/ //UNCOMMENT FOR ORIGINAL FUNCTION
         
         timesinceeat++;
         //update();
@@ -305,6 +306,7 @@ public class Snake extends JComponent {
                 }
             }
         }
+        //vals[vals.length-1]=Math.random()/10;
         return vals;
     }
     public boolean contains(int x, int y) {

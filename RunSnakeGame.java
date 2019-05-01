@@ -20,9 +20,9 @@ public class RunSnakeGame {
         }
         if (args.length==0) {
             System.out.println("no arguments supplied, using default settings");
-            numgens=250; //750
+            numgens=500; //750
             netspergen=2500; //30
-            dispgenbest=0;
+            dispgenbest=1;
             hidl_num=18;
             dispgraphs=1;
             graphwidth=400;
@@ -90,11 +90,11 @@ public class RunSnakeGame {
         frame.setSize(915,940);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        Snake p = new Snake(50,50,900,900);
+        Snake p = new Snake(20,20,900,900);
         //Snake p = new Snake(20,20,600,620);
         frame.add(p);
         p.setVisible(true);
-        int[] layers = {24,hidl_num,hidl_num,hidl_num,4};
+        int[] layers = {24,hidl_num,hidl_num,4};
         Generation g = new Generation(netspergen,layers,.01,.4);
         int bestscore=-1;
         Network bestnet = null;
@@ -156,8 +156,9 @@ public class RunSnakeGame {
             //g.setNets(nets);
             if (i!=genamt-1) {
                 //g.nextGen();
-                g.newNextGen();
+                //g.newNextGen();
                 //g.nextGenRand();
+                g.nextGenSemiRand();
             }
             //g.nextGenRand();
         }
