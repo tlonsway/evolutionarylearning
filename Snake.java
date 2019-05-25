@@ -35,8 +35,10 @@ public class Snake extends JComponent {
         screenheight=sh;
         //snakex=width/2;
         //snakey=height/2;
-        snakex=(int)(Math.random()*(width));
-        snakey=(int)(Math.random()*(height));
+        //snakex=(int)(Math.random()*(width));
+        //snakey=(int)(Math.random()*(height));
+        snakex=(int)(width/2);
+        snakey=(int)(height/2);
         score=0; 
         score2=0;
         numfood=1;
@@ -107,6 +109,8 @@ public class Snake extends JComponent {
         }
         int backloss=2;
         int closegain=1;
+        //score+=1;
+        //score+=1;
         if (dir==0) {
             snakex++;
             if (cxdir==1) {
@@ -248,8 +252,10 @@ public class Snake extends JComponent {
         dir=0;
         numfood=1;
         lose=false;
-        snakex=(int)(Math.random()*(width));
-        snakey=(int)(Math.random()*(height));
+        //snakex=(int)(Math.random()*(width));
+        //snakey=(int)(Math.random()*(height));
+        snakex=(int)(width/2);
+        snakey=(int)(height/2);
         previous = new ArrayList<int[]>();
         food = new int[]{(int)(Math.random()*(width-1))+1,(int)(Math.random()*(height-1))+1};
         timesinceeat=0;

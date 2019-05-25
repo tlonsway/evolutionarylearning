@@ -5,16 +5,20 @@ public class Generation {
     double mutaterate = .05; //proportion out of 1 of the number of the top networks to mutate
     Network[] networks;
     int[] lys;
-    public Generation(int networknum, int[] netlayers, double mrate, double tprop) {
+    String activationfunction;
+    String outputactivationfunction;
+    public Generation(int networknum, int[] netlayers, double mrate, double tprop, String af, String oaf) {
         if (!(networknum>=20)) {
             System.out.println("FATAL ERROR: There must be at least 20 networks in a generation");
             System.exit(1);
         }
+        activationfunction=af;
+        outputactivationfunction=oaf;
         numnet=networknum;
         lys=netlayers;
         networks = new Network[numnet];
         for(int i=0;i<numnet;i++) {
-            networks[i]=new Network(netlayers);
+            networks[i]=new Network(netlayers,af,oaf);
         }
         mutaterate=mrate;
         topprop=tprop;
@@ -31,6 +35,17 @@ public class Generation {
     }
     public Network[] getNets() {
         return networks;
+    }
+    public Network getBestNet() {
+        int bs = -1*Integer.MAX_VALUE;
+        Network bestnet = null;
+        for(Network n : networks) {
+            if (n.getScore()>bs) {
+                bs=(int)(n.getScore());
+                bestnet=n;
+            }
+        }
+        return bestnet;
     }
     public int getBestScore() {
         int bs = 0;
@@ -74,7 +89,7 @@ public class Generation {
             newnets.add(oldnetworks[i]);
         }
         for(int i=0;i<numrandom;i++) {
-            newnets.add(new Network(lys));
+            newnets.add(new Network(lys,activationfunction,outputactivationfunction));
         }   
         for(int i=0;i<numnet-50-numrandom;i++) {
             newnets.add(combine(oldnetworks[i%5],oldnetworks[(int)(Math.random()*oldnetworks.length)]));
@@ -95,7 +110,7 @@ public class Generation {
         //add in the top scorers to the new generation
         for(Network n : oldnets) {
             newnets.add(mutate(n)); //add mutations of best networks
-            newnets.add(new Network(lys,n.getWeights())); //direct copy of best networks to next generation
+            newnets.add(new Network(lys,n.getWeights(),n.getActivationFunctions())); //direct copy of best networks to next generation
         }
         //genetically breed the top percentage to make a new full set of data
         int numfromprev = (int)((numnet-2*oldnets.length)/5);
@@ -108,7 +123,7 @@ public class Generation {
         //mutations are automatically added to genetic combinations at mutation rate
         //add random new networks to add uniqueness
         for(int i=0;i<numnet-2*oldnets.length-numfromprev;i++) {
-            newnets.add(new Network(lys));
+            newnets.add(new Network(lys,activationfunction,outputactivationfunction));
         }
         for(int i=0;i<networks.length;i++) {
             networks[i]=newnets.get(i);
@@ -122,7 +137,7 @@ public class Generation {
         newnets.add(networks[0]);
         newnets.add(networks[1]);
         for(int i=0;i<numnet-2;i++) {
-            newnets.add(new Network(lys));
+            newnets.add(new Network(lys,activationfunction,outputactivationfunction));
         }
         for(int i=0;i<networks.length;i++) {
             networks[i]=newnets.get(i);
@@ -139,16 +154,21 @@ public class Generation {
         //add in the top scorers to the new generation
         for(Network n : oldnets) {
             //newnets.add(mutate(n)); //add mutations of best networks
-            newnets.add(new Network(lys,n.getWeights())); //direct copy of best networks to next generation
+            newnets.add(new Network(lys,n.getWeights(),n.getActivationFunctions())); //direct copy of best networks to next generation
         }
         int amt=0;
-        while(amt<numnet-oldnets.length) {
+        int amtmutate = (numnet-oldnets.length)/2;
+        int amtrandom = (numnet-oldnets.length)-amtmutate;
+        while(amt<amtmutate) {
             for(Network n : oldnets) {
                 if (amt<numnet-oldnets.length) {
                     newnets.add(mutate(n));
                     amt++;
                 }
             }
+        }
+        for(int i=0;i<amtrandom;i++) {
+            newnets.add(new Network(lys,activationfunction,outputactivationfunction));
         }
         for(int i=0;i<networks.length;i++) {
             networks[i]=newnets.get(i);
@@ -186,7 +206,7 @@ public class Generation {
                 }
             }
         }
-        return (new Network(lys,newnet));
+        return (new Network(lys,newnet,one.getActivationFunctions()));
     }
     public Network mutate(Network n) {
         ArrayList<double[]> newnet = new ArrayList<double[]>();
@@ -207,7 +227,7 @@ public class Generation {
                 }
             }
         }
-        Network ret = new Network(lys,newnet);
+        Network ret = new Network(lys,newnet,n.getActivationFunctions());
         /*System.out.println("before");
         n.printNet();
         System.out.println("after");

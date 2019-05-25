@@ -118,7 +118,7 @@ public class TrainBitcoin {
         SimulateBitcoin p = new SimulateBitcoin();
         
         int[] layers = {24,hidl_num,hidl_num,2};
-        Generation g = new Generation(netspergen,layers,.05,.2);
+        Generation g = new Generation(netspergen,layers,.05,.2,"relu","relu");
         int bestscore=Integer.MIN_VALUE;
         Network bestnet = null;
         int bestscoregen=0;

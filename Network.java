@@ -4,9 +4,13 @@ public class Network implements Comparable {
     private int[] lys;
     private double score;
     private double score2;
+    private String activationfunction;
+    private String outputactivationfunction;
     //layers looks like [num of ins, num in each hidden layer, num in output layer]
-    public Network(int[] layers) {
+    public Network(int[] layers, String af, String outaf) {
         lys=layers;
+        activationfunction=af;
+        outputactivationfunction=outaf;
         //weights = new double[][];
         weights = new ArrayList<double[]>();
         for(int i=0;i<layers.length-1;i++) {
@@ -18,8 +22,10 @@ public class Network implements Comparable {
             }
         }
     }
-    public Network(int[] layers, ArrayList<double[]> ws) {
+    public Network(int[] layers, ArrayList<double[]> ws, String[] afs) {
         lys=layers;
+        activationfunction=afs[0];
+        outputactivationfunction=afs[1];
         weights = new ArrayList<double[]>();
         for (double[] d : ws) {
             weights.add(d);
@@ -54,9 +60,19 @@ public class Network implements Comparable {
                 }
                 if (i==neurons.size()-1) {
                     //neurons.get(i)[i2]=sigmoid(sum);
-                    neurons.get(i)[i2]=relu(sum);
+                    //neurons.get(i)[i2]=relu(sum);
+                    if (outputactivationfunction.equals("sigmoid")) {
+                        neurons.get(i)[i2]=sigmoid(sum);
+                    } else if (outputactivationfunction.equals("relu")) {
+                        neurons.get(i)[i2]=relu(sum);
+                    }
                 } else {
-                    neurons.get(i)[i2]=relu(sum);
+                    if (activationfunction.equals("sigmoid")) {
+                        neurons.get(i)[i2]=sigmoid(sum);
+                    } else if (activationfunction.equals("relu")) {
+                        neurons.get(i)[i2]=relu(sum);
+                    }
+                    //neurons.get(i)[i2]=relu(sum);
                 }
                 noffset++;
             }
@@ -101,6 +117,9 @@ public class Network implements Comparable {
     }
     public int[] getLayers() {
         return lys;
+    }
+    public String[] getActivationFunctions() {
+        return new String[]{activationfunction,outputactivationfunction};
     }
     public void printNet() {
         for(double[] da : weights) {

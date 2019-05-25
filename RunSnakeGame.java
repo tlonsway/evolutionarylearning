@@ -90,12 +90,12 @@ public class RunSnakeGame {
         frame.setSize(915,940);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        Snake p = new Snake(20,20,900,900);
+        Snake p = new Snake(40,40,900,900);
         //Snake p = new Snake(20,20,600,620);
         frame.add(p);
         p.setVisible(true);
-        int[] layers = {24,hidl_num,hidl_num,4};
-        Generation g = new Generation(netspergen,layers,.01,.4);
+        int[] layers = {24,hidl_num,hidl_num,hidl_num,4};
+        Generation g = new Generation(netspergen,layers,.02,.4,"relu","relu");
         int bestscore=-1;
         Network bestnet = null;
         int genamt=numgens;
