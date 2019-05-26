@@ -45,15 +45,21 @@ public class GAN {
         Network bestgenerative = generative.getBestNet();
         Network bestdiscriminative = null;
         
+        double[] randomnoise = new double[784];
+        for(int rni=0;rni<randomnoise.length;rni++) {
+            randomnoise[rni]=(int)(Math.random()*255);
+        }
+        
+        
         for(int gnum=0;gnum<generationnum;gnum++) {
             //EVOLVE DISCRIMINATIVE
             
             //feed synthetic image to discriminative network
             
-            double[] randomnoise = new double[784];
-            for(int rni=0;rni<randomnoise.length;rni++) {
-                randomnoise[rni]=(int)(Math.random()*255);
-            }
+            // double[] randomnoise = new double[784];
+            // for(int rni=0;rni<randomnoise.length;rni++) {
+                // randomnoise[rni]=(int)(Math.random()*255);
+            // }
             
             double[] generatedimage = bestgenerative.forward(randomnoise);
             
@@ -161,10 +167,10 @@ public class GAN {
             Network[] generativenetworks = generative.getNets();
             
             
-            randomnoise = new double[784];
-            for(int rni=0;rni<randomnoise.length;rni++) {
-                randomnoise[rni]=(int)(Math.random()*255);
-            }
+            // randomnoise = new double[784];
+            // for(int rni=0;rni<randomnoise.length;rni++) {
+                // randomnoise[rni]=(int)(Math.random()*255);
+            // }
             
             
             for(Network n : generativenetworks) {
@@ -215,23 +221,23 @@ public class GAN {
             
             //OUTPUT BEST GENERATIVE
             
-            randomnoise = new double[784];
-            for(int rni=0;rni<randomnoise.length;rni++) {
-                randomnoise[rni]=(int)(Math.random()*255);
-            }
+            // randomnoise = new double[784];
+            // for(int rni=0;rni<randomnoise.length;rni++) {
+                // randomnoise[rni]=(int)(Math.random()*255);
+            // }
             
             generatedimage = bestgenerative.forward(randomnoise);
             IMAGEDISPLAY.setImage(generatedimage);
             
         }
-        while(true) {
-            double[] randomnoise = new double[784];
-            for(int rni=0;rni<randomnoise.length;rni++) {
-                randomnoise[rni]=(int)(Math.random()*255);
-            }
+        //while(true) {
+            // double[] randomnoise = new double[784];
+            // for(int rni=0;rni<randomnoise.length;rni++) {
+                // randomnoise[rni]=(int)(Math.random()*255);
+            // }
             
-            double[] generatedimage = bestgenerative.forward(randomnoise);
-            IMAGEDISPLAY.setImage(generatedimage);
-        }
+        double[] generatedimage = bestgenerative.forward(randomnoise);
+        IMAGEDISPLAY.setImage(generatedimage);
+        //}
     }
 }
