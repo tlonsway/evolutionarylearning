@@ -63,7 +63,7 @@ public class Snake extends JComponent {
         if (food[0]==snakex&&food[1]==snakey) {
             food = new int[]{(int)(Math.random()*(width-1))+1,(int)(Math.random()*(height-1))+1};
             previous.add(new int[]{snakex,snakey});
-            score+=10;
+            score+=20;
             score2+=1;
             numfood++;
             timesinceeat=0;
@@ -88,7 +88,7 @@ public class Snake extends JComponent {
             dir=3;
         }
         
-        if (dir==0&&lastdec==3 || dir==3&&lastdec==1 || dir==1&&lastdec==2 || dir==2&&lastdec==1) {
+        if (dir==0&&lastdec==3 || dir==3&&lastdec==0 || dir==1&&lastdec==2 || dir==2&&lastdec==1) {
             dir=lastdec;
             //score=-1000000;
             //lose=true;
@@ -107,7 +107,7 @@ public class Snake extends JComponent {
         } else if (food[1]==snakey) {
             cydir=2;
         }
-        int backloss=2;
+        int backloss=3;
         int closegain=1;
         //score+=1;
         //score+=1;
@@ -156,7 +156,7 @@ public class Snake extends JComponent {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (time>timeout) {
+        if (timesinceeat>timeout) {
             //score+=100000;
             lose=true;
         } else {

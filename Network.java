@@ -88,7 +88,11 @@ public class Network implements Comparable {
         return (1)/(1+(Math.pow(Math.E,-1*in)));
     }
     private static double relu(double in) {
-        return in;
+        if (in>0) {
+            return in;
+        } else {
+            return 0;
+        }
     }
     public void setScore(double num) {
         score=num;

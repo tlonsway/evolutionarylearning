@@ -20,8 +20,8 @@ public class RunSnakeGame {
         }
         if (args.length==0) {
             System.out.println("no arguments supplied, using default settings");
-            numgens=500; //750
-            netspergen=2500; //30
+            numgens=10000; //750
+            netspergen=5000; //30
             dispgenbest=1;
             hidl_num=18;
             dispgraphs=1;
@@ -90,12 +90,12 @@ public class RunSnakeGame {
         frame.setSize(915,940);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        Snake p = new Snake(40,40,900,900);
+        Snake p = new Snake(20,20,900,900);
         //Snake p = new Snake(20,20,600,620);
         frame.add(p);
         p.setVisible(true);
-        int[] layers = {24,hidl_num,hidl_num,hidl_num,4};
-        Generation g = new Generation(netspergen,layers,.02,.4,"relu","relu");
+        int[] layers = {24,hidl_num,hidl_num,4};
+        Generation g = new Generation(netspergen,layers,.02,.2,"relu","relu");
         int bestscore=-1;
         Network bestnet = null;
         int genamt=numgens;
@@ -111,12 +111,12 @@ public class RunSnakeGame {
                 }*/
                 int sum=0;
                 //int sum2=0;
-                for(int i2=0;i2<4;i2++) {
+                for(int i2=0;i2<12;i2++) {
                     int[] scoreb = p.simulate(n,false,true,false,-1,i);
                     sum+=scoreb[0];
                     //sum2+=scoreb[1];
                 }
-                int score = (int)(sum/4);
+                int score = (int)(sum/12);
                 allscoresrounded.add(10*((double)((int)(score/10))));
                 
                 //int score2 = (int)(sum2/2);
@@ -156,9 +156,9 @@ public class RunSnakeGame {
             //g.setNets(nets);
             if (i!=genamt-1) {
                 //g.nextGen();
-                //g.newNextGen();
+                g.newNextGen();
                 //g.nextGenRand();
-                g.nextGenSemiRand();
+                //g.nextGenSemiRand();
             }
             //g.nextGenRand();
         }
