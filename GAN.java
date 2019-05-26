@@ -32,14 +32,14 @@ public class GAN {
         
         
         
-        int generationnum = 100;
+        int generationnum = 20000;
         int actualimagesdiscriminator = 1;
         
         
-        int[] generativelayers = {784,150,150,784};
+        int[] generativelayers = {784,350,350,784};
         Generation generative = new Generation(100,generativelayers,.005,.4,"relu","relu");
         
-        int[] discriminativelayers = {1568,500,100,1};
+        int[] discriminativelayers = {1568,500,200,1};
         Generation discriminative = new Generation(100,discriminativelayers,.005,.4,"relu","sigmoid");
         
         Network bestgenerative = generative.getBestNet();
@@ -90,13 +90,18 @@ public class GAN {
                     gii++;
                 }
             }
+            int correctfits = 0;
             
             for(Network n : discriminativenetworks) {
                 int actual = 0; //image is synthetic
                 double observed = (n.forward(discriminativeinput))[0];
                 double score = 1-((observed-actual)*(observed-actual));
+                if (observed<.5) {
+                    correctfits++;
+                }
                 n.setScore(score);
             }
+            System.out.println("Correct Synthetic Predictions: " + correctfits);
             
             discriminative.sortGen();
             discriminative.newNextGen();
@@ -129,14 +134,17 @@ public class GAN {
                     gii++;
                 }
             }
-            
+            correctfits=0;
             for(Network n : discriminativenetworks) {
                 int actual = 1; //image is real
                 double observed = (n.forward(discriminativeinput))[0];
                 double score = 1-((observed-actual)*(observed-actual));
+                if (observed>.5) {
+                    correctfits++;
+                }
                 n.setScore(score);
             }
-            
+            System.out.println("Correct Real Predictions: " + correctfits);
             bestdiscriminative=discriminative.getBestNet();
             
             discriminative.sortGen();
@@ -215,6 +223,15 @@ public class GAN {
             generatedimage = bestgenerative.forward(randomnoise);
             IMAGEDISPLAY.setImage(generatedimage);
             
+        }
+        while(true) {
+            double[] randomnoise = new double[784];
+            for(int rni=0;rni<randomnoise.length;rni++) {
+                randomnoise[rni]=(int)(Math.random()*255);
+            }
+            
+            double[] generatedimage = bestgenerative.forward(randomnoise);
+            IMAGEDISPLAY.setImage(generatedimage);
         }
     }
 }
