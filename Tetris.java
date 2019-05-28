@@ -24,7 +24,7 @@ public class Tetris extends JComponent{
     }
     public void update(){
         rotateRight();
-        fbPos[1]++;
+        
         if(collided()){
             fbPos[1]--;
             for(int x = 0; x < fallingBlock.length;x++){
@@ -37,6 +37,7 @@ public class Tetris extends JComponent{
             fbPos = new int[]{9,0};
             fallingBlock = getShape();
         }
+        fbPos[1]++;
     }
     public void rotateRight(){
         int[][] newBlock = new int[fallingBlock[0].length][fallingBlock.length];
@@ -45,7 +46,15 @@ public class Tetris extends JComponent{
                 newBlock[y][x] = fallingBlock[x][y];
             }
         }
-        fallingBlock = newBlock;
+        int[][] temp = new int[newBlock.length][newBlock[0].length];
+        for(int x = 0; x < newBlock.length/2; x++){
+            temp[x] = newBlock[newBlock.length-1-x];
+            temp[newBlock.length-1-x] = newBlock[x];
+        }
+        if(newBlock.length%2 == 1){
+            temp[(int)(newBlock.length/2)] = newBlock[(int)(newBlock.length/2)];
+        }
+        fallingBlock = temp;
     }
     public boolean collided(){
         for(int x = 0; x < fallingBlock.length; x++){
