@@ -2,13 +2,15 @@ import javax.swing.*;
 import java.awt.*;
 public class Tetris extends JComponent{
     int[][] board;
-    int[][][] blocks = new int[][][]{ {{1},{1},{1}} , {{1,1},{0,1},{0,1}} , {{1,1},{1,1}} , {{1,1,1},{0,1,0}}};
+    int[][][] blocks = new int[][][]{ {{1},{1},{1}} , {{1,1},{0,1},{0,1}} , {{1,1},{1,1}} , {{1,1,1},{0,1,0}} , {{1,1,0},{0,1,1}} , {{0,1,1},{1,1,0}} , {{1,1},{1,0},{1,0}}};
     int[][] fallingBlock;
     int[] fbPos;
+    boolean movingRight;
+    boolean movingLeft;
     /*
-     * {1}, {1,1},      
-     * {1}, {0,1}, {1,1} {1,1,1}
-       {1}  {0,1}  {1,1} {0,1,0}
+     * {1}, {1,1},                               {1,1}
+     * {1}, {0,1}, {1,1} {1,1,1} {1,1,0} {0,1,1} {1,0}
+       {1}  {0,1}  {1,1} {0,1,0} {0,1,1} {1,1,0} {1,0}
      * 
      */
     public Tetris(){
@@ -18,13 +20,14 @@ public class Tetris extends JComponent{
         board = new int[20][50];
         fallingBlock = getShape();
         fbPos = new int[]{9,0};
+        movingRight = false;
+        movingLeft = false;
     }
     public void draw(){
         super.repaint();
     }
     public void update(){
         rotateRight();
-        
         if(collided()){
             fbPos[1]--;
             for(int x = 0; x < fallingBlock.length;x++){
