@@ -10,7 +10,7 @@ public class RunTetrisGame {
         frame.add(t);
         t.setVisible(true);
         int[] layers = {31,18,18,18,4};
-        int netspergen = 200;
+        int netspergen = 1500;
         int numgens = 500;
         boolean dispgenbest = true;
         Generation g = new Generation(netspergen,layers,.02,.2,"relu","sigmoid");
@@ -26,12 +26,12 @@ public class RunTetrisGame {
                     int[] scoreb = t.simulate(n,false,true,false,-1,i);
                     sum+=scoreb[0];
                 }
-                int score = (int)(sum/12);
+                int score = (int)(sum/5);
                 if (score>bestscore) {
                     bestscore=score;
                     System.out.println("new best score of " + bestscore);
-                    System.out.println("BEST NETWORK WEIGHTS:");
-                    n.printNet();
+                    //System.out.println("BEST NETWORK WEIGHTS:");
+                    //n.printNet();
                     if (bestnet!=null) {
                         System.out.println("comparing new bestnet with previous");
                         Network.compareNets(bestnet,n);
@@ -42,7 +42,7 @@ public class RunTetrisGame {
             }
             g.sortGen();
             Network genBest = g.getNets()[0];
-            if (dispgenbest) {
+            if (dispgenbest&&i%5==0) {
                 t.simulate(genBest,true,true,true,-1,i);
             }
             if (i!=genamt-1) {
