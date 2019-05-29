@@ -4,7 +4,7 @@ public class RunTetrisGame {
     public static void main(String[] args) {
         JFrame frame = new JFrame("Tetris Window");
         frame.setVisible(true);
-        frame.setSize(1000,1000);
+        frame.setSize(1000,1080);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Tetris t = new Tetris();
         frame.add(t);
