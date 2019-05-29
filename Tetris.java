@@ -10,7 +10,6 @@ public class Tetris extends JComponent{
     double[] choices;
     int score;
     boolean isAlive;
-    int count = 1;
     /*
      * {1}, {1,1},                               {1,1}
      * {1}, {0,1}, {1,1} {1,1,1} {1,1,0} {0,1,1} {1,0}
@@ -71,7 +70,6 @@ public class Tetris extends JComponent{
             }
             fbPos = new int[]{9,0};
             fallingBlock = getShape();
-            count++;
             if(collided()){
                 isAlive = false;
             }
@@ -82,6 +80,31 @@ public class Tetris extends JComponent{
             dropAllBlocks(row);
             row = checkRow();
         }
+    }
+    public double[] getInputs(){
+        double[] ret = new double[31];
+        ret[0] = fbPos[0]/board.length;
+        ret[1] = fbPos[1]/board[0].length;
+        int count = 2;
+        for(int x = 0; x < fallingBlock.length; x++){
+            for(int y = 0; y < fallingBlock[0].length; y++){
+                ret[count] = fallingBlock[x][y];
+                count++;
+            }
+            while(count%3 !=  0){
+                count++;
+            }
+        }
+        for(int x = 0; x  < board.length; x++){
+            int highest = board[0].length;
+            for(int y = board[0].length-1; y >= 0; y--){
+                if(board[x][y] == 1 && y < highest){
+                    highest = y;
+                }
+            }
+            ret[11+x] = highest/board[0].length;
+        }
+        return ret;
     }
     public void dropAllBlocks(int r){
         for(int x = 0; x < board.length; x++){
@@ -163,9 +186,9 @@ public class Tetris extends JComponent{
     public void paintComponent(Graphics g){
         super.paintComponent(g);
         g.setColor(Color.GRAY);
-        g.fillRect(0,0,500,1000);
+        g.fillRect(0,0,480,1000);
         g.setColor(Color.BLACK);
-        g.fillRect(20,0,460,1000);
+        g.fillRect(20,0,440,1000);
         g.setColor(Color.BLUE);
         for(int x = 0; x < board.length; x++){
             for(int y = 0; y < board[x].length; y++){

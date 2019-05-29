@@ -12,7 +12,13 @@ public class tetrisTester{
             game.draw();
             game.choices = new double[]{Math.random(),Math.random(),Math.random(),Math.random()};
             game.update();
+            double[] inputs = game.getInputs();
             /*
+            for(double b: inputs){
+                System.out.print(b);
+            }
+            System.out.println();
+            
             if(game.count%10 == 0){
                 for(int x = 0; x < game.board.length; x++){
                     game.board[x][47] = 1;
