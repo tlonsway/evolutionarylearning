@@ -203,6 +203,9 @@ public class Tetris extends JComponent{
         for(int x = 0; x < fallingBlock.length; x++){
             for(int y = 0; y < fallingBlock[x].length; y++){
                 if(y+fbPos[1] >= board[0].length || fbPos[0]+x < 0|| x+fbPos[0] >= 20 || (board[x+fbPos[0]][y+fbPos[1]] == 1 && fallingBlock[x][y] == 1)){
+                    if(fbPos[0]+x < 0|| x+fbPos[0] >= 20){
+                        score -= 2;
+                    }
                     return true;
                 }
             }
