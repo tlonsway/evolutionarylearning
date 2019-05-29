@@ -72,7 +72,10 @@ public class Tetris extends JComponent{
             biggest=decision[3];
             dec=4;
         }
-        
+        if (decision[4]>biggest) {
+            biggest=decision[4];
+            dec=0;
+        }
         if(dec==1){
             fbPos[0]++;
             if(collided()){
