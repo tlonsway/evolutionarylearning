@@ -10,7 +10,7 @@ public class RunTetrisGame {
         frame.add(t);
         t.setVisible(true);
         int[] layers = {1012,18,18,5};
-        int netspergen = 1500;
+        int netspergen = 100;
         int numgens = 500;
         boolean dispgenbest = true;
         Generation g = new Generation(netspergen,layers,.02,.2,"relu","relu");
