@@ -88,16 +88,16 @@ public class Tetris extends JComponent{
                     }
                 }
             }
+            score += (fbPos[1]/board[0].length)*2;
             fbPos = new int[]{9,0};
             fallingBlock = getShape();
-            score++;
             if(collided()){
                 isAlive = false;
             }
         }
         int row = checkRow();
         while(row != -1){
-            score += 10;
+            score += 30;
             dropAllBlocks(row);
             row = checkRow();
         }
