@@ -28,7 +28,8 @@ public class GANWords {
         
         double[] randomnoise = new double[50];
         for(int rni=0;rni<randomnoise.length;rni++) {
-            randomnoise[rni]=(int)(Math.random()*255);
+            //randomnoise[rni]=(int)(Math.random()*255);
+            randomnoise[rni]=(int)(Math.random()*75)+48;
         }
         
         

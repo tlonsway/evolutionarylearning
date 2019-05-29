@@ -8,8 +8,9 @@ public class Tetris extends JComponent{
     boolean movingRight;
     boolean movingLeft;
     double[] choices;
-    int score;
+    double score;
     boolean isAlive;
+    Network n;
     /*
      * {1}, {1,1},                               {1,1}
      * {1}, {0,1}, {1,1} {1,1,1} {1,1,0} {0,1,1} {1,0}
@@ -30,10 +31,29 @@ public class Tetris extends JComponent{
         score = 0;
         isAlive = true;
     }
+    public int[] simulate(Network net, boolean draw, boolean btime, boolean delay, int t, int gnum) {
+        n=net;
+        reset();
+        while(isAlive) {
+            update();
+            if (draw) {
+                draw();
+                try {
+                    if (delay) {
+                        Thread.sleep(10);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return new int[]{(int)score};
+    }
     public void draw(){
         super.repaint();
     }
     public void update(){
+        choices = n.forward(getInputs());
         if(choices[0] > 0.5){
             fbPos[0]++;
             if(collided()){
@@ -70,6 +90,7 @@ public class Tetris extends JComponent{
             }
             fbPos = new int[]{9,0};
             fallingBlock = getShape();
+            score++;
             if(collided()){
                 isAlive = false;
             }
