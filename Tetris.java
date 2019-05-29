@@ -53,31 +53,51 @@ public class Tetris extends JComponent{
         super.repaint();
     }
     public void update(){
-        choices = n.forward(getInputs());
-        if(choices[0] > 0.5){
+        double[] decision = n.forward(getInputs());
+        int dec=0;
+        double biggest=-1*Integer.MAX_VALUE;
+        if (decision[0]>biggest) {
+            biggest=decision[0];
+            dec=1;
+        }
+        if (decision[1]>biggest) {
+            biggest=decision[1];
+            dec=2;
+        }
+        if (decision[2]>biggest) {
+            biggest=decision[2];
+            dec=3;
+        }
+        if (decision[3]>biggest) {
+            biggest=decision[3];
+            dec=4;
+        }
+        
+        if(dec==1){
             fbPos[0]++;
             if(collided()){
                 fbPos[0]--;
             }
         }   
-        if(choices[1] > 0.5){
+        if(dec==2){
             fbPos[0]--;
             if(collided()){
                 fbPos[0]++;
             }
         }
-        if(choices[2] > 0.5){
+        if(dec==3){
             rotateRight();
             if(collided()){
                 rotateLeft();
             }   
         }
-        if(choices[3] > 0.5){
+        if(dec==4){
             rotateLeft();
             if(collided()){
                 rotateRight();
             }
         }
+        
         fbPos[1]++;
         if(collided()){
             fbPos[1]--;
@@ -88,7 +108,7 @@ public class Tetris extends JComponent{
                     }
                 }
             }
-            score += (fbPos[1]/board[0].length)*2;
+            score += ((double)fbPos[1]/(double)board[0].length)*((double)fbPos[1]/(double)board[0].length)*((double)fbPos[1]/(double)board[0].length);
             fbPos = new int[]{9,0};
             fallingBlock = getShape();
             if(collided()){
@@ -97,7 +117,7 @@ public class Tetris extends JComponent{
         }
         int row = checkRow();
         while(row != -1){
-            score += 30;
+            score += 100;
             dropAllBlocks(row);
             row = checkRow();
         }

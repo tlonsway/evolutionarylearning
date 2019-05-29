@@ -13,7 +13,7 @@ public class RunTetrisGame {
         int netspergen = 1500;
         int numgens = 500;
         boolean dispgenbest = true;
-        Generation g = new Generation(netspergen,layers,.02,.2,"relu","sigmoid");
+        Generation g = new Generation(netspergen,layers,.02,.2,"relu","relu");
         int bestscore = -1;
         Network bestnet = null;
         int genamt=numgens;
@@ -42,7 +42,7 @@ public class RunTetrisGame {
             }
             g.sortGen();
             Network genBest = g.getNets()[0];
-            if (dispgenbest&&i%5==0) {
+            if (dispgenbest&&i%1==0) {
                 t.simulate(genBest,true,true,true,-1,i);
             }
             if (i!=genamt-1) {
