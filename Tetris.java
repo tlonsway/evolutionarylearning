@@ -108,7 +108,7 @@ public class Tetris extends JComponent{
                     }
                 }
             }
-            score += ((double)fbPos[1]/(double)board[0].length)*((double)fbPos[1]/(double)board[0].length)*((double)fbPos[1]/(double)board[0].length);
+            score += ((double)fbPos[1]/(double)board[0].length);
             fbPos = new int[]{9,0};
             fallingBlock = getShape();
             if(collided()){
@@ -124,8 +124,8 @@ public class Tetris extends JComponent{
     }
     public double[] getInputs(){
         double[] ret = new double[31];
-        ret[0] = fbPos[0]/board.length;
-        ret[1] = fbPos[1]/board[0].length;
+        ret[0] = fbPos[0];
+        ret[1] = fbPos[1];
         int count = 2;
         for(int x = 0; x < fallingBlock.length; x++){
             for(int y = 0; y < fallingBlock[0].length; y++){
@@ -143,7 +143,7 @@ public class Tetris extends JComponent{
                     highest = y;
                 }
             }
-            ret[11+x] = highest/board[0].length;
+            ret[11+x] = highest;
         }
         return ret;
     }
@@ -204,7 +204,7 @@ public class Tetris extends JComponent{
             for(int y = 0; y < fallingBlock[x].length; y++){
                 if(y+fbPos[1] >= board[0].length || fbPos[0]+x < 0|| x+fbPos[0] >= 20 || (board[x+fbPos[0]][y+fbPos[1]] == 1 && fallingBlock[x][y] == 1)){
                     if(fbPos[0]+x < 0|| x+fbPos[0] >= 20){
-                        score -= 2;
+                        //score -= 2;
                     }
                     return true;
                 }

@@ -91,7 +91,7 @@ public class Network implements Comparable {
         if (in>0) {
             return in;
         } else {
-            return 0;
+            return in;
         }
     }
     public void setScore(double num) {
