@@ -28,7 +28,7 @@ public class tetrisTester{
             }
             */
             if(!game.isAlive){
-                game.reset();
+                game.reset(false);
             }
             try{
                 Thread.sleep(50);

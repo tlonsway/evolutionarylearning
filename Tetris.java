@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.*;
 public class Tetris extends JComponent{
     int[][] board;
     int[][][] blocks = new int[][][]{ {{1},{1},{1}} , {{1,1},{0,1},{0,1}} , {{1,1},{1,1}} , {{1,1,1},{0,1,0}} , {{1,1,0},{0,1,1}} , {{0,1,1},{1,1,0}} , {{1,1},{1,0},{1,0}}};
@@ -10,7 +11,11 @@ public class Tetris extends JComponent{
     double[] choices;
     double score;
     boolean isAlive;
+    boolean isDrawing = false;
+    Color fbColor;
+    ArrayList<ArrayList<Color>> colorBoard;
     Network n;
+    int currentHolesOnBoard;
     /*
      * {1}, {1,1},                               {1,1}
      * {1}, {0,1}, {1,1} {1,1,1} {1,1,0} {0,1,1} {1,0}
@@ -18,9 +23,9 @@ public class Tetris extends JComponent{
      * 
      */
     public Tetris(){
-        reset();
+        reset(false);
     }
-    public void reset(){
+    public void reset(boolean id){
         board = new int[20][50];
         fallingBlock = getShape();
         fbPos = new int[]{9,0};
@@ -30,10 +35,16 @@ public class Tetris extends JComponent{
         choices = new double[4];
         score = 0;
         isAlive = true;
+        isDrawing = id;
+        if(id){
+            System.out.println("Setting Color board");
+            setColorBoard();
+        }
+        currentHolesOnBoard = 0;
     }
     public int[] simulate(Network net, boolean draw, boolean btime, boolean delay, int t, int gnum) {
         n=net;
-        reset();
+        reset(draw);
         while(isAlive) {
             update();
             if (draw) {
@@ -49,6 +60,7 @@ public class Tetris extends JComponent{
         }
         return new int[]{(int)score};
     }
+    
     public void draw(){
         super.repaint();
     }
@@ -112,11 +124,17 @@ public class Tetris extends JComponent{
                 }
             }
             score += ((double)fbPos[1]/(double)board[0].length);
+            if(isDrawing){
+                addShapeToColorBoard();
+            }
             fbPos = new int[]{9,0};
             fallingBlock = getShape();
             if(collided()){
                 isAlive = false;
             }
+        }
+        if(isDrawing){
+            checkForHole();
         }
         int row = checkRow();
         while(row != -1){
@@ -150,6 +168,15 @@ public class Tetris extends JComponent{
         }
         return ret;
     }
+    private void addShapeToColorBoard(){
+        for(int x = 0; x < fallingBlock.length; x++){
+            for(int y = 0; y < fallingBlock[x].length;y++){
+                if(fallingBlock[x][y] == 1){
+                    colorBoard.get(x+fbPos[0]).set(y+fbPos[1],fbColor);
+                }
+            }
+        }
+    }
     public double[] getInputsLarge() {
         double[] ret = new double[1012];
         ret[0] = fbPos[0];
@@ -172,6 +199,44 @@ public class Tetris extends JComponent{
         }
         return ret;
     }
+    public boolean checkForHole(){
+        int count = 0;
+        for(int x = 0; x < board.length; x++){
+            for(int y = 0; y < board[x].length;y++){
+                boolean contin = true;
+                int minX = x-1;
+                int minY = y-1;
+                int maxX = x+1;
+                int maxY = y+1;
+                if(minX < 0)minX = 0;
+                if(minY < 0)minY = 0;
+                if(maxX >= board.length)maxX = board.length-1;
+                if(maxY >= board[x].length)maxY = board[x].length-1;
+                for(int col = minX; col <= maxX; col++){
+                    for(int row = minY; row <= maxY; row++){
+                        if(board[col][row] == 0){
+                            contin = false;
+                            break;
+                        }
+                    }
+                    if(!contin){
+                        break;
+                    }
+                }
+                if(contin){
+                    count++;
+                }
+            }
+        }
+        if(isDrawing){
+            System.out.println(count);
+        }
+        if(count > currentHolesOnBoard){
+            currentHolesOnBoard = count;
+            return true;
+        }
+        return false;
+    }
     public void dropAllBlocks(int r){
         for(int x = 0; x < board.length; x++){
             board[x][r] = 0;
@@ -188,6 +253,9 @@ public class Tetris extends JComponent{
         if(r > 0){
             for(int y = r-1; y >= 0; y--){
                 for(int x = 0; x < board.length; x++){
+                    if(isDrawing){
+                        colorBoard.get(x).set(y+1,colorBoard.get(x).get(y));
+                    }
                     board[x][y+1] = board[x][y];
                 }
             }
@@ -219,6 +287,15 @@ public class Tetris extends JComponent{
         }
         fallingBlock = temp;
     }
+    private void setColorBoard(){
+        colorBoard = new ArrayList<ArrayList<Color>>();
+        for(int x  = 0; x < board.length; x++){
+            colorBoard.add(new ArrayList<Color>());
+            for(int y = 0; y < board[0].length;y++){
+                colorBoard.get(x).add(null);
+            }
+        }
+    }
     public void rotateLeft(){
         for(int i = 0; i < 3; i++){
             rotateRight();
@@ -242,6 +319,9 @@ public class Tetris extends JComponent{
             boolean found = true;
             for(int x = 0; x < board.length; x++){
                 if(board[x][y] == 0){
+                    if(isDrawing){
+                        colorBoard.get(x).set(y,null);
+                    }
                     found = false;
                 }
             }
@@ -250,26 +330,36 @@ public class Tetris extends JComponent{
                 return y;
             }
         }
+        
         return -1;
     }
     public void paintComponent(Graphics g){
         super.paintComponent(g);
         g.setColor(Color.GRAY);
-        g.fillRect(0,0,480,1000);
+        g.fillRect(0,0,420,1000);
         g.setColor(Color.BLACK);
-        g.fillRect(20,0,440,1000);
+        g.fillRect(20,0,400,1000);
         g.setColor(Color.BLUE);
+        
         for(int x = 0; x < board.length; x++){
             for(int y = 0; y < board[x].length; y++){
+                if(colorBoard != null && colorBoard.get(x).get(y) != null){
+                    g.setColor(colorBoard.get(x).get(y));
+                }
                 if(board[x][y] == 1){
                     g.fillRect((x+1)*20,y*20,20,20);
                 }
             }
         }
-        g.setColor(Color.RED);
+        if(fbColor != null){
+            g.setColor(fbColor);
+        }
+        else{
+            g.setColor(Color.RED);
+        }
         for(int x = 0; x < fallingBlock.length; x++){
             for(int y = 0; y < fallingBlock[x].length; y++){
-                if(fallingBlock[x][y] ==  1){
+                if(fallingBlock[x][y] == 1){
                     g.fillRect((fbPos[0]+1+x)*20,(fbPos[1]+y)*20,20,20);
                 }
                 //  System.out.print(fallingBlock[x][y]+" ");
@@ -283,6 +373,9 @@ public class Tetris extends JComponent{
         //System.out.println("----------------------------");
     }
     public int[][] getShape(){
+        if(isDrawing){
+            fbColor = new Color((int)(Math.random()*255),(int)(Math.random()*255),(int)(Math.random()*255));
+        }
         return blocks[(int)(Math.random()*blocks.length)];
     }
 }
