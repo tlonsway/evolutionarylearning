@@ -53,7 +53,7 @@ public class Tetris extends JComponent{
         super.repaint();
     }
     public void update(){
-        double[] decision = n.forward(getInputs());
+        double[] decision = n.forward(getInputsLarge());
         int dec=0;
         double biggest=-1*Integer.MAX_VALUE;
         if (decision[0]>biggest) {
@@ -147,6 +147,28 @@ public class Tetris extends JComponent{
                 }
             }
             ret[11+x] = highest;
+        }
+        return ret;
+    }
+    public double[] getInputsLarge() {
+        double[] ret = new double[1012];
+        ret[0] = fbPos[0];
+        ret[1] = fbPos[1];
+        int count = 2;
+        for(int x = 0; x < fallingBlock.length; x++){
+            for(int y = 0; y < fallingBlock[0].length; y++){
+                ret[count] = fallingBlock[x][y];
+                count++;
+            }
+            while(count%3 !=  0){
+                count++;
+            }
+        }
+        for(int x=0;x<board.length;x++) {
+            for(int y=0;y<board[0].length;y++) {
+                ret[count]=board[x][y];
+                count++;
+            }
         }
         return ret;
     }

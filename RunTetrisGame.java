@@ -9,7 +9,7 @@ public class RunTetrisGame {
         Tetris t = new Tetris();
         frame.add(t);
         t.setVisible(true);
-        int[] layers = {31,18,18,5};
+        int[] layers = {1012,18,18,5};
         int netspergen = 1500;
         int numgens = 500;
         boolean dispgenbest = true;
