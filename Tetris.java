@@ -16,6 +16,7 @@ public class Tetris extends JComponent{
     ArrayList<ArrayList<Color>> colorBoard;
     Network n;
     int currentHolesOnBoard;
+    double[] previousdecision;
     /*
      * {1}, {1,1},                               {1,1}
      * {1}, {0,1}, {1,1} {1,1,1} {1,1,0} {0,1,1} {1,0}
@@ -65,7 +66,8 @@ public class Tetris extends JComponent{
         super.repaint();
     }
     public void update(){
-        double[] decision = n.forward(getInputsLarge());
+        double[] decision = n.forward(getInputs());
+        previousdecision=decision;
         int dec=0;
         double biggest=-1*Integer.MAX_VALUE;
         if (decision[0]>biggest) {
@@ -123,7 +125,7 @@ public class Tetris extends JComponent{
                     }
                 }
             }
-            score += ((double)fbPos[1]/(double)board[0].length);
+            score += (((double)fbPos[1]/(double)board[0].length)*3)-1;
             if(isDrawing){
                 addShapeToColorBoard();
             }
@@ -133,10 +135,19 @@ public class Tetris extends JComponent{
                 isAlive = false;
             }
         }
-        if(isDrawing){
-            checkForHole();
+        int previous = currentHolesOnBoard;
+        checkForHole();
+        int diffholecount = currentHolesOnBoard-previous;
+        if (diffholecount==1) {
+            score-=1;
+        } else if (diffholecount>1) {
+            score-=2;
         }
+        
+        
+        
         int row = checkRow();
+        
         while(row != -1){
             score += 100;
             dropAllBlocks(row);
@@ -198,39 +209,40 @@ public class Tetris extends JComponent{
             }
         }
         return ret;
-    }
-    public boolean checkForHole(){
+    }    public boolean checkForHole(){
         int count = 0;
         for(int x = 0; x < board.length; x++){
             for(int y = 0; y < board[x].length;y++){
-                boolean contin = true;
-                int minX = x-1;
-                int minY = y-1;
-                int maxX = x+1;
-                int maxY = y+1;
-                if(minX < 0)minX = 0;
-                if(minY < 0)minY = 0;
-                if(maxX >= board.length)maxX = board.length-1;
-                if(maxY >= board[x].length)maxY = board[x].length-1;
-                for(int col = minX; col <= maxX; col++){
-                    for(int row = minY; row <= maxY; row++){
-                        if(board[col][row] == 0){
-                            contin = false;
+                if (board[x][y]==0) {
+                    boolean contin = true;
+                    int minX = x-1;
+                    int minY = y-1;
+                    int maxX = x+1;
+                    int maxY = y+1;
+                    if(minX < 0)minX = 0;
+                    if(minY < 0)minY = 0;
+                    if(maxX >= board.length)maxX = board.length-1;
+                    if(maxY >= board[x].length)maxY = board[x].length-1;
+                    for(int col = minX; col <= maxX; col++){
+                        for(int row = minY; row <= maxY; row++){
+                            if(board[col][row] == 0 && row!=y && col!=x){
+                                contin = false;
+                                break;
+                            }
+                        }
+                        if(!contin){
                             break;
                         }
                     }
-                    if(!contin){
-                        break;
+                    if(contin){
+                        count++;
                     }
-                }
-                if(contin){
-                    count++;
                 }
             }
         }
-        if(isDrawing){
-            System.out.println(count);
-        }
+        //if(isDrawing){
+            //System.out.println(count);
+        //}
         if(count > currentHolesOnBoard){
             currentHolesOnBoard = count;
             return true;
