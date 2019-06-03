@@ -144,15 +144,30 @@ public class Tetris extends JComponent{
             score-=2;
         }
         
+        for(int r=0;r<board[0].length;r++) {
+            int cnt = this.filledInRow(r);
+            if (cnt>15) {
+                score+=5;
+            }
+        }
         
         
         int row = checkRow();
         
         while(row != -1){
-            score += 100;
+            score += 1000;
             dropAllBlocks(row);
             row = checkRow();
         }
+    }
+    public int filledInRow(int r) {
+        int num=0;
+        for(int c=0;c<board.length;c++) {
+            if (board[c][r]==1) {
+                num++;
+            }
+        }
+        return num;
     }
     public double[] getInputs(){
         double[] ret = new double[31];

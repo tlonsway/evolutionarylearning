@@ -9,11 +9,11 @@ public class RunTetrisGame {
         Tetris t = new Tetris();
         frame.add(t);
         t.setVisible(true);
-        int[] layers = {31,18,18,18,5};
+        int[] layers = {31,18,18,18,18,5};
         int netspergen = 500;
-        int numgens = 500;
+        int numgens = 5000;
         boolean dispgenbest = true;
-        Generation g = new Generation(netspergen,layers,.02,.2,"relu","relu");
+        Generation g = new Generation(netspergen,layers,.01,.3,"relu","relu");
         int bestscore = -1;
         Network bestnet = null;
         int genamt=numgens;
