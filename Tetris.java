@@ -66,7 +66,7 @@ public class Tetris extends JComponent{
         super.repaint();
     }
     public void update(){
-        double[] decision = n.forward(getInputs());
+        double[] decision = n.forward(getInputsColumnCount());
         previousdecision=decision;
         int dec=0;
         double biggest=-1*Integer.MAX_VALUE;
@@ -146,9 +146,19 @@ public class Tetris extends JComponent{
         
         for(int r=0;r<board[0].length;r++) {
             int cnt = this.filledInRow(r);
-            if (cnt>15) {
-                score+=5;
+            if (cnt>19) {
+                score+=16;
+            } else
+            if (cnt>18) {
+                score+=8;
+            } else
+            if (cnt>17) {
+                score+=4;
+            } else
+            if (cnt>16) {
+                score+=2;
             }
+            
         }
         
         
@@ -194,6 +204,38 @@ public class Tetris extends JComponent{
         }
         return ret;
     }
+    public double[] getInputsColumnCount() {
+        double[] ret = new double[51];
+        ret[0] = fbPos[0];
+        ret[1] = fbPos[1];
+        int count = 2;
+        for(int x = 0; x < fallingBlock.length; x++){
+            for(int y = 0; y < fallingBlock[0].length; y++){
+                ret[count] = fallingBlock[x][y];
+                count++;
+            }
+            while(count%3 !=  0){
+                count++;
+            }
+        }
+        for(int x = 0; x  < board.length; x++){
+            int highest = board[0].length;
+            for(int y = board[0].length-1; y >= 0; y--){
+                if(board[x][y] == 1 && y < highest){
+                    highest = y;
+                }
+            }
+            ret[11+x] = highest;
+        }
+        for(int x=0;x<board.length;x++) {
+            int tempnum=0;
+            for(int y=0;y<board[x].length;y++) {
+                tempnum+=board[x][y];
+            }
+            ret[11+board.length+x] = tempnum;
+        }
+        return ret;
+    }
     private void addShapeToColorBoard(){
         for(int x = 0; x < fallingBlock.length; x++){
             for(int y = 0; y < fallingBlock[x].length;y++){
@@ -224,7 +266,8 @@ public class Tetris extends JComponent{
             }
         }
         return ret;
-    }    public boolean checkForHole(){
+    }    
+    public boolean checkForHole(){
         int count = 0;
         for(int x = 0; x < board.length; x++){
             for(int y = 0; y < board[x].length;y++){
