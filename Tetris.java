@@ -61,12 +61,11 @@ public class Tetris extends JComponent{
         }
         return new int[]{(int)score};
     }
-    
     public void draw(){
         super.repaint();
     }
     public void update(){
-        double[] decision = n.forward(getInputsColumnCount());
+        double[] decision = n.forward(getInputsLarge());
         previousdecision=decision;
         int dec=0;
         double biggest=-1*Integer.MAX_VALUE;
@@ -125,7 +124,8 @@ public class Tetris extends JComponent{
                     }
                 }
             }
-            score += (((double)fbPos[1]/(double)board[0].length)*3)-1;
+            //score += (((double)fbPos[1]/(double)board[0].length)*3)-1;
+            score += 2*(50-fbPos[1]);
             if(isDrawing){
                 addShapeToColorBoard();
             }
@@ -146,26 +146,34 @@ public class Tetris extends JComponent{
         
         for(int r=0;r<board[0].length;r++) {
             int cnt = this.filledInRow(r);
-            if (cnt>19) {
-                score+=16;
-            } else
-            if (cnt>18) {
-                score+=8;
-            } else
-            if (cnt>17) {
-                score+=4;
-            } else
-            if (cnt>16) {
-                score+=2;
+            if (r>10) {
+                if (cnt>19) {
+                    score+=16;
+                } else
+                if (cnt>18) {
+                    score+=8;
+                } else
+                if (cnt>17) {
+                    score+=4;
+                } else
+                if (cnt>16) {
+                    score+=2;
+                } else
+                if (cnt>10) {
+                    score+=1;
+                }
+            } else if (r<10) {
+                if (cnt>=1) {
+                   // score-=1;
+                }
             }
-            
         }
         
         
         int row = checkRow();
         
         while(row != -1){
-            score += 1000;
+            score += 3000;
             dropAllBlocks(row);
             row = checkRow();
         }

@@ -113,7 +113,7 @@ public class Generation {
             newnets.add(new Network(lys,n.getWeights(),n.getActivationFunctions())); //direct copy of best networks to next generation
         }
         //genetically breed the top percentage to make a new full set of data
-        int numfromprev = (int)((numnet-2*oldnets.length)/5);
+        int numfromprev = (int)((numnet-2*oldnets.length)/3);
         for(int i=0;i<numfromprev;i++) {
             //generate a new network
             int rand1 = (int)(Math.random()*oldnets.length);

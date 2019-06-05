@@ -9,12 +9,12 @@ public class RunTetrisGame {
         Tetris t = new Tetris();
         frame.add(t);
         t.setVisible(true);
-        int[] layers = {51,72,55,18,5};
-        int netspergen = 750;
+        int[] layers = {1012,250,100,15,5};
+        int netspergen = 100;
         int numgens = 5000;
         boolean dispgenbest = true;
-        Generation g = new Generation(netspergen,layers,.05,.3,"relu","relu");
-        int bestscore = -1;
+        Generation g = new Generation(netspergen,layers,.02,.4,"relu","relu");
+        int bestscore = -1*Integer.MAX_VALUE;
         Network bestnet = null;
         int genamt=numgens;
         for(int i=0;i<genamt;i++) {
@@ -22,11 +22,11 @@ public class RunTetrisGame {
             Network[] nets = g.getNets();
             for(Network n : nets) {
                 int sum=0;
-                for(int i2=0;i2<5;i2++) {
+                for(int i2=0;i2<2;i2++) {
                     int[] scoreb = t.simulate(n,false,true,false,-1,i);
                     sum+=scoreb[0];
                 }
-                int score = (int)(sum/5);
+                int score = (int)(sum/2);
                 if (score>bestscore) {
                     bestscore=score;
                     System.out.println("new best score of " + bestscore);
