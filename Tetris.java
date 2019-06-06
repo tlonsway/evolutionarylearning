@@ -125,7 +125,14 @@ public class Tetris extends JComponent{
                 }
             }
             //score += (((double)fbPos[1]/(double)board[0].length)*3)-1;
-            score += 2*(50-fbPos[1]);
+            if (fbPos[1]>25) {
+                score += 2*(fbPos[1]);
+                if (fbPos[1]>47) {
+                    score+=500;
+                }
+            } else {
+                score -= fbPos[1];
+            }
             if(isDrawing){
                 addShapeToColorBoard();
             }
@@ -160,7 +167,7 @@ public class Tetris extends JComponent{
                     score+=2;
                 } else
                 if (cnt>10) {
-                    score+=1;
+                    score+=.01;
                 }
             } else if (r<10) {
                 if (cnt>=1) {
