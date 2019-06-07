@@ -23,6 +23,9 @@ public class Generation {
         mutaterate=mrate;
         topprop=tprop;
     }
+    public void setMutationRate(double newrate) {
+        mutaterate=newrate; //could also implement varying topprop when population becomes too diverse or too homogenous
+    }
     public void sortGen() {
         ArrayList<Network> nets = new ArrayList<Network>();
         for(Network n : networks) {

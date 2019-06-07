@@ -17,6 +17,7 @@ public class Tetris extends JComponent{
     Network n;
     int currentHolesOnBoard;
     double[] previousdecision;
+    int[] rowcounts;
     /*
      * {1}, {1,1},                               {1,1}
      * {1}, {0,1}, {1,1} {1,1,1} {1,1,0} {0,1,1} {1,0}
@@ -28,6 +29,7 @@ public class Tetris extends JComponent{
     }
     public void reset(boolean id){
         board = new int[20][50];
+        rowcounts = new int[board[0].length];
         fallingBlock = getShape();
         fbPos = new int[]{9,0};
         movingRight = false;
@@ -65,7 +67,7 @@ public class Tetris extends JComponent{
         super.repaint();
     }
     public void update(){
-        double[] decision = n.forward(getInputsLarge());
+        double[] decision = n.forward(getInputs());
         previousdecision=decision;
         int dec=0;
         double biggest=-1*Integer.MAX_VALUE;
@@ -125,10 +127,10 @@ public class Tetris extends JComponent{
                 }
             }
             //score += (((double)fbPos[1]/(double)board[0].length)*3)-1;
-            if (fbPos[1]>25) {
+            if (fbPos[1]>35) {
                 score += 2*(fbPos[1]);
                 if (fbPos[1]>47) {
-                    score+=500;
+                    score+=1000;
                 }
             } else {
                 score -= fbPos[1];
@@ -146,14 +148,18 @@ public class Tetris extends JComponent{
         checkForHole();
         int diffholecount = currentHolesOnBoard-previous;
         if (diffholecount==1) {
-            score-=1;
+            score-=50;
         } else if (diffholecount>1) {
-            score-=2;
+            score-=100;
         }
+        
         
         for(int r=0;r<board[0].length;r++) {
             int cnt = this.filledInRow(r);
-            if (r>10) {
+            if (!(cnt>rowcounts[r])) {
+                cnt=0;
+            }
+            if (r>40) {
                 if (cnt>19) {
                     score+=16;
                 } else
@@ -165,22 +171,20 @@ public class Tetris extends JComponent{
                 } else
                 if (cnt>16) {
                     score+=2;
-                } else
-                if (cnt>10) {
-                    score+=.01;
                 }
             } else if (r<10) {
                 if (cnt>=1) {
                    // score-=1;
                 }
             }
+            rowcounts[r]=cnt;
         }
         
         
         int row = checkRow();
         
         while(row != -1){
-            score += 3000;
+            score += 6000;
             dropAllBlocks(row);
             row = checkRow();
         }
