@@ -113,8 +113,8 @@ public class BitcoinTrend {
         SimulateBitcoin p = new SimulateBitcoin();
         
         
-        int[] layers = {48,96,96,96,1};
-        Generation g = new Generation(netspergen,layers,.01,.1,"relu","relu");
+        int[] layers = {24,48,48,1};
+        Generation g = new Generation(netspergen,layers,.01,.1,"sigmoid","sigmoid");
         int bestscore = Integer.MIN_VALUE;
         Network bestnet = null;
         int bestscoregen = 0;
@@ -129,9 +129,89 @@ public class BitcoinTrend {
             Network[] nets = g.getNets();
             
             
-            
+                
+                
+            try {
+                httpout = new FileWriter("index.html");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            httpprint = new PrintWriter(httpout,true);
+            httpprint.println("<meta http-equiv=\"refresh\" content=\"10\">");
+            httpprint.println("<html>");
+            httpprint.println("<h3>START TIME: " + calcStartTime + "</h2>");
+            httpprint.println("<h3>PREDICTED COMPUTE TIME: " + predictTime + "</h2>");
+            httpprint.println("<p> </p>\n<p> </p>\n<p> </p>\n<p> </p>\n<p> </p>\n");
+            httpprint.println("<h2>PROGRESS</h2>");
+            httpprint.println("<p>[" + percentDraw + "] (" + percentNum + "%)</p>");
+            httpprint.println("<p>Current Generation: " + i + "/" + genamt + "</p>");
+            httpprint.println("<p> </p>\n<p> </p>\n<p> </p>\n<p> </p>\n<p> </p>\n");
+            httpprint.println("<h2>CURRENT BEST</h2>");
+            httpprint.println("<p>Best score: " + bestscore + "</p>");
+            httpprint.println("<p>Generation of top scorer: " + bestscoregen + "</p>");
+            httpprint.println("<p>Prediction of best under testarr:</p>");
+            if (bestnet!=null) {
+                double[] prediction = runTestArr(bestnet, layers[0]);
+                for(int ih=0;ih<prediction.length;ih++) {
+                    //httpprint.println("<p>Up: "+ prediction[0] + "%</p");
+                    //httpprint.println("<p>Down: "+ prediction[1] + "%</p");
+                    httpprint.println("<p>" + ih + ": " + prediction[ih] + "</p>");
+                }
+            }
+            httpprint.println("</html>");
+            httpprint.flush();
+            for(Network n : nets) {
+                int score = p.simulateImproved(n,false);
+                if (score>bestscore) {
+                    bestscore=score;
+                    bestscoregen=i;
+                    System.out.println("new best score of " + bestscore);
+                    //httpprint.println("<p>new best score of " + bestscore + "</p>");
+                    //httpprint.flush();
+                    if (bestnet!=null) {
+                        System.out.println("comparing new bestnet with previous");
+                        Network.compareNets(bestnet, n);
+                    }
+                    bestnet = n;
+                }
+            }
+            if (i%1==0) {
+                if (dispgraphs==1) {
+                    arg.addPoint(i,g.getGenAverageScore1());
+                    //a2r.addPoint(i,g.getGenAverageScore2());
+                    brg.addPoint(i,g.getBestScore());
+                    //b2g.addPoint(i,g.getBestScore2());
+                    bog.addPoint(i,bestscore);
+                }
+            }
+            g.sortGen();
+            Network genBest = g.getNets()[0];
+            if (genamt>=100) {
+                if (i%(genamt/100)==0) {
+                    System.out.println(roundPercent(((double)i/(double)genamt)*100) + "% complete with network");
+                    int perc = (int)(roundPercent(((double)i/(double)genamt)*100));
+                    char[] pd = percentDraw.toCharArray();
+                    pd[perc]='I';
+                    percentDraw=String.valueOf(pd);
+                    percentNum=""+perc;
+                }
+            }
+            if (i==9) {
+                long seconds = (long)(((((double)(java.lang.System.currentTimeMillis()-startTime))/10)/1000)*(double)genamt);
+                int day = (int)TimeUnit.SECONDS.toDays(seconds);        
+                long hours = TimeUnit.SECONDS.toHours(seconds) - (day *24);
+                long minute = TimeUnit.SECONDS.toMinutes(seconds) - (TimeUnit.SECONDS.toHours(seconds)* 60);
+                long second = TimeUnit.SECONDS.toSeconds(seconds) - (TimeUnit.SECONDS.toMinutes(seconds) *60);
+                predictTime = day + " days " + hours + " hours " + minute + " minutes " + second + " seconds";
+                predictEndTime = "";
+                System.out.println("Predicted computation time: " + day + " days " + hours + " hours " + minute + " minutes " + second + " seconds");
+            }
+            if (i!=genamt-1) {
+                g.newNextGen();
+            }
         }
-       
+        g.sortGen();
+        System.out.println("simulating final network - with a score of " + bestnet.getScore());
         
     }
     private static String printDate() {
@@ -144,5 +224,18 @@ public class BitcoinTrend {
     private static double roundPercent(double p) {
         p+=.00005;
         return (((double)((int)(p*100)))/100);
+    }
+    private static double[] runTestArr(Network n,int layer_0) {
+        double[] testarr2 = new double[]{2482.09,2489.09,2483.72,2481.72,2499.98,2497.61,2498.92,2490.83,2491.4,2500,2500.97,2516.66,2517.01,2525,2504.09,2492.61,2490.08,2496.37,2476.41,2463.86,2442.99,2435.62,2440.87,2449.6,2436.07,2457.54,2461.99,2431.95,2421.55,2439.97,2412,2404.99,2407.81,2409.9,2391.87,2423.63,2424.99,2416.62,2408.25,2435.99,2425.94,2445.99,2460.01,2467.83,2459.35,2454.43,2488.43,2509.17};
+        double[] testarr = new double[layer_0];
+        for(int i=0;i<layer_0;i++) {
+            testarr[i]=testarr2[i];
+        }
+        double[] netout = n.forward(testarr);
+        double[] ret = new double[netout.length];
+        for(int i=0;i<netout.length;i++) {
+            ret[i]=netout[i];
+        }
+        return ret;
     }
 }
