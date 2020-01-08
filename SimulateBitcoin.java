@@ -38,4 +38,20 @@ public class SimulateBitcoin {
         //System.out.println("network achieved score of: " + totalscore);
         return (int)totalscore;
     }
+    public int simulateImproved(Network n) {
+        long totalscore = 0;
+        for(int i=0;i<prices.size()-ins-outs;i++) {
+            double[] netin = new double[ins];
+            for(int i2=i;i2<i+ins;i2++) {
+                netin[i2-i]=(prices.get(i2));
+            }
+            double[] netout = n.forward(netin);
+            for(int v=0;v<netout.length;v++) {
+                double dis = prices.get(v+i+ins);
+                
+            }
+            
+        }     
+        return (int)totalscore;
+    }
 }

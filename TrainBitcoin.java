@@ -26,7 +26,7 @@ public class TrainBitcoin {
         if (args.length==0) {
             System.out.println("no arguments supplied, using default settings");
             numgens=75; //750
-            netspergen=2500; //30
+            netspergen=250; //30
             dispgenbest=1;
             hidl_num=18;
             dispgraphs=1;
