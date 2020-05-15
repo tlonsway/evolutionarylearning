@@ -107,8 +107,11 @@ public class Snake extends JComponent {
         } else if (food[1]==snakey) {
             cydir=2;
         }
-        int backloss=3;
-        int closegain=1;
+        //int backloss=3;
+        //int closegain=1;
+        int backloss = 0;
+        int closegain = 0;
+        
         //score+=1;
         //score+=1;
         if (dir==0) {

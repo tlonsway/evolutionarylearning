@@ -23,7 +23,7 @@ public class RunSnakeGame {
             numgens=10000; //750
             netspergen=5000; //30
             dispgenbest=1;
-            hidl_num=18;
+            hidl_num=32;
             dispgraphs=1;
             graphwidth=400;
             graphheight=420;
@@ -94,8 +94,8 @@ public class RunSnakeGame {
         //Snake p = new Snake(20,20,600,620);
         frame.add(p);
         p.setVisible(true);
-        int[] layers = {24,hidl_num,hidl_num,4};
-        Generation g = new Generation(netspergen,layers,.02,.2,"relu","relu");
+        int[] layers = {24,hidl_num,hidl_num,hidl_num,4};
+        Generation g = new Generation(netspergen,layers,.005,.3,"relu","relu");
         int bestscore=-1;
         Network bestnet = null;
         int genamt=numgens;
